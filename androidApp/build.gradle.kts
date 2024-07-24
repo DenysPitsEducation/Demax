@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -26,6 +27,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -38,10 +40,16 @@ android {
 }
 
 dependencies {
-    implementation(projects.shared)
+    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.navigation)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
-    implementation(libs.androidx.activity.compose)
-    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.koin.core)
+    implementation(libs.kotlinx.serialization)
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(projects.core)
+    implementation(projects.featureAuthorization)
+    implementation(projects.featureDestructions)
 }

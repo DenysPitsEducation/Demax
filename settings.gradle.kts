@@ -15,5 +15,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Demax"
-include(":androidApp")
-include(":shared")
+include("androidApp")
+include(":core")
+include(":feature-authorization")
+include(":feature-destructions")
