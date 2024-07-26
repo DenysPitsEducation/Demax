@@ -9,18 +9,18 @@ class ResourcesRepositoryImpl : ResourcesRepository {
         return Result.success(listOf(
             ResourceDomainModel(
                 id = 4373,
-                imageUrl = "https://picsum.photos/200/200",
+                imageUrl = "https://picsum.photos/300/200?random=1",
                 name = "Антисептичні серветки",
                 category = "Медичні засоби",
-                progress = 0.3,
+                amount = ResourceDomainModel.AmountDomainModel(currentAmount = 3, totalAmount = 10),
                 status = ResourceDomainModel.StatusDomainModel.ACTIVE
             ),
             ResourceDomainModel(
                 id = 8246,
-                imageUrl = "https://picsum.photos/300/200",
+                imageUrl = "https://picsum.photos/300/200?random=2",
                 name = "Цегла",
                 category = "Будівельні матеріали",
-                progress = 1.0,
+                amount = ResourceDomainModel.AmountDomainModel(currentAmount = 5, totalAmount = 5),
                 status = ResourceDomainModel.StatusDomainModel.COMPLETED
             ),
         ))

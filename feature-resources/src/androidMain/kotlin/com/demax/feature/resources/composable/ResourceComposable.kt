@@ -92,7 +92,7 @@ fun ResourceComposable(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Row {
                     Text(
-                        text = model.progress.percentage,
+                        text = model.progress.amount,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.width(4.dp))

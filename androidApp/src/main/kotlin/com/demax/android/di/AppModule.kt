@@ -8,6 +8,7 @@ import com.demax.feature.authorization.passwordReset.PasswordResetPayload
 import com.demax.feature.authorization.registration.RegistrationPayload
 import com.demax.feature.destructions.navigation.DestructionsRouter
 import com.demax.feature.resources.navigation.ResourcesRouter
+import com.demax.feature.responses.navigation.ResponsesRouter
 import org.koin.dsl.module
 
 fun appModule() = module {
@@ -36,6 +37,10 @@ fun appModule() = module {
     }
     factory<ResourcesRouter> {
         object : ResourcesRouter {
+        }
+    }
+    factory<ResponsesRouter> {
+        object : ResponsesRouter {
         }
     }
 }

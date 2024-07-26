@@ -5,9 +5,13 @@ data class ResourceDomainModel(
     val imageUrl: String?,
     val name: String,
     val category: String,
-    val progress: Double,
+    val amount: AmountDomainModel,
     val status: StatusDomainModel,
 ) {
+    data class AmountDomainModel(
+        val currentAmount: Int,
+        val totalAmount: Int,
+    )
 
     enum class StatusDomainModel {
         ACTIVE, COMPLETED

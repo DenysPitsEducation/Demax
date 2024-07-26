@@ -1,14 +1,10 @@
 package com.demax.feature.resources.mapper
 
 import androidx.compose.ui.graphics.Color
-import com.demax.core.utils.formatFractionalPart
 import com.demax.feature.resources.domain.model.ResourceDomainModel
 import com.demax.feature.resources.model.ResourceUiModel
 import com.demax.feature.resources.model.ResourcesUiModel
 import com.demax.feature.resources.mvi.ResourcesState
-import kotlinx.datetime.toJavaLocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 internal class ResourcesUiMapper {
 
@@ -26,15 +22,16 @@ internal class ResourcesUiMapper {
             imageUrl = imageUrl,
             name = name,
             category = category,
-            progress = getProgressUiModel(progress),
+            progress = getProgressUiModel(amount),
             status = status.toUiModel()
         )
     }
 
-    private fun getProgressUiModel(progress: Double): ResourceUiModel.ProgressUiModel {
+    private fun getProgressUiModel(amount: ResourceDomainModel.AmountDomainModel): ResourceUiModel.ProgressUiModel {
+        val progress = amount.currentAmount * 1.0 / amount.totalAmount
         return ResourceUiModel.ProgressUiModel(
             progress = progress,
-            percentage = "${(progress * 100).formatFractionalPart()}%",
+            amount = "${amount.currentAmount}/${amount.totalAmount}",
             text = if (progress == 1.0) "Завершено" else "У процесі",
             color = if (progress == 1.0) Color(0xFF198038) else Color(0xFF0043CE),
         )

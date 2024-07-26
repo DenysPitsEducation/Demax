@@ -29,6 +29,8 @@ import com.demax.feature.destructions.navigation.DestructionsPayload
 import com.demax.feature.destructions.composable.DestructionsScreen
 import com.demax.feature.resources.composable.ResourcesScreen
 import com.demax.feature.resources.navigation.ResourcesPayload
+import com.demax.feature.responses.composable.ResponsesScreen
+import com.demax.feature.responses.navigation.ResponsesPayload
 
 @Composable
 fun MainScreen() {
@@ -54,12 +56,12 @@ fun MainScreen() {
                     NavigationBarItemModel(
                         text = "Відгуки",
                         icon = Icons.Default.Star,
-                        payload = DestructionsPayload
+                        payload = ResponsesPayload
                     ),
                     NavigationBarItemModel(
                         text = "Профіль",
                         icon = Icons.Default.AccountCircle,
-                        payload = ResourcesPayload
+                        payload = ResponsesPayload
                     ),
                 )
                 items.forEachIndexed { index, item ->
@@ -105,6 +107,9 @@ fun MainScreen() {
             }
             composable<ResourcesPayload> {
                 ResourcesScreen(navController)
+            }
+            composable<ResponsesPayload> {
+                ResponsesScreen(navController)
             }
         }
     }

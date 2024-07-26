@@ -163,7 +163,10 @@ fun DestructionItemComposable(
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 model.specializations.forEach { specialization ->
                     LabelComposable(specialization, Color(0xFFF3F3F3))
                 }

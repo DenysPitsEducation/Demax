@@ -13,7 +13,7 @@ data class ResourceUiModel(
 
     data class ProgressUiModel(
         val progress: Double,
-        val percentage: String,
+        val amount: String,
         val text: String,
         val color: Color,
     )
