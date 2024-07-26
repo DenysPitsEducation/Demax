@@ -71,8 +71,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-data class NavigationBarItemModel(
-    val text: String,
-    val icon: ImageVector,
-)

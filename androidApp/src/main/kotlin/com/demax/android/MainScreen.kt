@@ -19,12 +19,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.demax.feature.destructions.navigation.DestructionsPayload
 import com.demax.feature.destructions.composable.DestructionsScreen
+import com.demax.feature.resources.composable.ResourcesScreen
+import com.demax.feature.resources.navigation.ResourcesPayload
 
 @Composable
 fun MainScreen() {
@@ -37,10 +41,26 @@ fun MainScreen() {
                 val currentDestination = navBackStackEntry?.destination
                 var selectedItem by remember { mutableIntStateOf(0) }
                 val items = listOf(
-                    NavigationBarItemModel("Руйнування", Icons.Default.Search),
-                    NavigationBarItemModel("Ресурси", Icons.Default.Inventory),
-                    NavigationBarItemModel("Відгуки", Icons.Default.Star),
-                    NavigationBarItemModel("Профіль", Icons.Default.AccountCircle),
+                    NavigationBarItemModel(
+                        text = "Руйнування",
+                        icon = Icons.Default.Search,
+                        payload = DestructionsPayload
+                    ),
+                    NavigationBarItemModel(
+                        text = "Ресурси",
+                        icon = Icons.Default.Inventory,
+                        payload = ResourcesPayload
+                    ),
+                    NavigationBarItemModel(
+                        text = "Відгуки",
+                        icon = Icons.Default.Star,
+                        payload = DestructionsPayload
+                    ),
+                    NavigationBarItemModel(
+                        text = "Профіль",
+                        icon = Icons.Default.AccountCircle,
+                        payload = ResourcesPayload
+                    ),
                 )
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
@@ -54,7 +74,7 @@ fun MainScreen() {
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index
-                            /*navController.navigate(navigationItem.route) {
+                            navController.navigate(item.payload) {
                                 // Pop up to the start destination of the graph to
                                 // avoid building up a large stack of destinations
                                 // on the back stack as users select items
@@ -66,7 +86,7 @@ fun MainScreen() {
                                 launchSingleTop = true
                                 // Restore state when reselecting a previously selected item
                                 restoreState = true
-                            }*/
+                            }
                         }
                     )
                 }
@@ -83,6 +103,15 @@ fun MainScreen() {
             composable<DestructionsPayload> {
                 DestructionsScreen(navController)
             }
+            composable<ResourcesPayload> {
+                ResourcesScreen(navController)
+            }
         }
     }
 }
+
+private data class NavigationBarItemModel(
+    val text: String,
+    val icon: ImageVector,
+    val payload: Any,
+)
