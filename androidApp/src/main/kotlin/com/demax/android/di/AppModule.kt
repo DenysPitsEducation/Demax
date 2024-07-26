@@ -6,7 +6,7 @@ import com.demax.feature.authorization.common.AuthorizationRouter
 import com.demax.feature.authorization.login.LoginPayload
 import com.demax.feature.authorization.passwordReset.PasswordResetPayload
 import com.demax.feature.authorization.registration.RegistrationPayload
-import com.demax.feature.destructions.DestructionsRouter
+import com.demax.feature.destructions.navigation.DestructionsRouter
 import org.koin.dsl.module
 
 fun appModule() = module {

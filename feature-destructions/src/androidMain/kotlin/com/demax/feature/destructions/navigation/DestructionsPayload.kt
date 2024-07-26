@@ -1,4 +1,4 @@
-package com.demax.feature.destructions
+package com.demax.feature.destructions.navigation
 
 import kotlinx.serialization.Serializable
 

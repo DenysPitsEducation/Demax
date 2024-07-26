@@ -41,31 +41,31 @@ class MainActivity : ComponentActivity() {
                         snackbarHost = {
                             SnackbarHost(hostState = snackbarHostState)
                         },
-                        content = { innerPadding ->
-                            NavHost(
-                                navController = navController,
-                                startDestination = AuthorizationPayload,
-                                modifier = Modifier.consumeWindowInsets(innerPadding)
-                                    .padding(innerPadding)
-                            ) {
-                                navigation<AuthorizationPayload>(startDestination = LoginPayload) {
-                                    composable<LoginPayload> {
-                                        LoginScreen(navController)
-                                    }
-                                    composable<RegistrationPayload> {
-                                        RegistrationScreen(navController)
-                                    }
-                                    composable<PasswordResetPayload> {
-                                        PasswordResetScreen()
-                                    }
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ) { innerPadding ->
+                        NavHost(
+                            navController = navController,
+                            startDestination = MainPayload,
+                            modifier = Modifier
+                                .consumeWindowInsets(innerPadding)
+                                .padding(innerPadding)
+                        ) {
+                            navigation<AuthorizationPayload>(startDestination = LoginPayload) {
+                                composable<LoginPayload> {
+                                    LoginScreen(navController)
                                 }
-                                composable<MainPayload> {
-                                    MainScreen()
+                                composable<RegistrationPayload> {
+                                    RegistrationScreen(navController)
+                                }
+                                composable<PasswordResetPayload> {
+                                    PasswordResetScreen()
                                 }
                             }
-                        },
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    )
+                            composable<MainPayload> {
+                                MainScreen()
+                            }
+                        }
+                    }
                 }
             }
         }

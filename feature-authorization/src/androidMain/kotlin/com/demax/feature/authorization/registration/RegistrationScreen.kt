@@ -60,7 +60,7 @@ private fun RegistrationContent(state: RegistrationState, onUserInteraction: OnU
         Spacer(modifier = Modifier.height(100.dp))
         Text(
             text = "Створення облікового запису",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(30.dp))
         OutlinedTextField(

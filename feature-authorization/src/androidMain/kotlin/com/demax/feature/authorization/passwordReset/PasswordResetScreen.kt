@@ -47,7 +47,7 @@ fun PasswordResetContent(state: PasswordResetState, onUserInteraction: OnUserInt
         Spacer(modifier = Modifier.height(100.dp))
         Text(
             text = "Забули пароль?",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(30.dp))
         OutlinedTextField(

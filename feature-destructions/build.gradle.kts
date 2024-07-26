@@ -27,19 +27,22 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
+            implementation(libs.coil.compose)
             implementation(libs.compose.activity)
-            implementation(project.dependencies.platform(libs.compose.bom))
+            implementation(libs.compose.icons.extended)
             implementation(libs.compose.material3)
             implementation(libs.compose.navigation)
             implementation(libs.compose.ui)
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.compose.viewModel)
-            implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.android)
             implementation(libs.koin.compose)
+            implementation(project.dependencies.platform(libs.compose.bom))
+            implementation(project.dependencies.platform(libs.koin.bom))
         }
         commonMain.dependencies {
             implementation(libs.firebase.auth)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization)
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(projects.core)

@@ -64,7 +64,7 @@ private fun LoginContent(
         Spacer(modifier = Modifier.height(100.dp))
         Text(
             text = "З поверненням!",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(30.dp))
         OutlinedTextField(
