@@ -18,6 +18,7 @@ rootProject.name = "Demax"
 include("androidApp")
 include(":core")
 include(":feature-authorization")
+include(":feature-destruction-details")
 include(":feature-destructions")
 include(":feature-resources")
 include(":feature-responses")

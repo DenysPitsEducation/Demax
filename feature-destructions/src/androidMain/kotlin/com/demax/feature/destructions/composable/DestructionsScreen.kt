@@ -42,6 +42,7 @@ import com.demax.feature.destructions.DestructionsViewModel
 import com.demax.feature.destructions.mapper.DestructionsUiMapper
 import com.demax.feature.destructions.model.DestructionItemUiModel
 import com.demax.feature.destructions.model.DestructionsUiModel
+import com.demax.feature.destructions.mvi.DestructionsSideEffect
 import org.koin.compose.koinInject
 
 internal typealias OnUserInteraction = (DestructionsIntent) -> Unit
@@ -58,12 +59,9 @@ fun DestructionsScreen(navController: NavHostController) {
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
-        /*when (sideEffect) {
-            is DestructionsSideEffect.OpenMainScreen -> router.openMainScreen(navController)
-            is DestructionsSideEffect.OpenPasswordResetScreen -> router.openPasswordResetScreen(navController)
-            is DestructionsSideEffect.OpenRegistrationScreen -> router.openRegistrationScreen(navController)
-            is DestructionsSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
-        }*/
+        when (sideEffect) {
+            is DestructionsSideEffect.OpenDestructionDetails -> router.openDestructionDetails(navController, sideEffect.id)
+        }
     }
 
     DestructionsContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
@@ -160,7 +158,10 @@ private fun DestructionsContent(
             contentPadding = PaddingValues(bottom = 30.dp)
         ) {
             items(model.destructionItemUiModels) { destructionItemUiModel ->
-                DestructionItemComposable(model = destructionItemUiModel, onUserInteraction)
+                DestructionItemComposable(
+                    model = destructionItemUiModel,
+                    onUserInteraction = onUserInteraction,
+                )
             }
         }
         Spacer(modifier = Modifier.height(50.dp))

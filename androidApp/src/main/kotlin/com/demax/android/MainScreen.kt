@@ -25,6 +25,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.demax.feature.destruction.details.composable.DestructionDetailsScreen
+import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
 import com.demax.feature.destructions.navigation.DestructionsPayload
 import com.demax.feature.destructions.composable.DestructionsScreen
 import com.demax.feature.resources.composable.ResourcesScreen
@@ -102,6 +104,9 @@ fun MainScreen() {
                 .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
         ) {
+            composable<DestructionDetailsPayload> {
+                DestructionDetailsScreen(navController)
+            }
             composable<DestructionsPayload> {
                 DestructionsScreen(navController)
             }

@@ -57,6 +57,6 @@ class DestructionsViewModel(
     }
 
     private fun onDestructionClicked(intent: DestructionsIntent.DestructionClicked) {
-        TODO("Not yet implemented")
+        viewModelScope.emitSideEffect(DestructionsSideEffect.OpenDestructionDetails(intent.id))
     }
 }
