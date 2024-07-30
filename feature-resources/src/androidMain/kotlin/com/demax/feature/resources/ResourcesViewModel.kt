@@ -35,8 +35,8 @@ class ResourcesViewModel(
             is ResourcesIntent.SearchInputChanged -> onSearchInputChanged(intent)
             is ResourcesIntent.SortClicked -> onSortClicked()
             is ResourcesIntent.FilterClicked -> onFilterClicked()
-            is ResourcesIntent.AddDestructionClicked -> onAddDestructionClicked()
-            is ResourcesIntent.DestructionClicked -> onDestructionClicked(intent)
+            is ResourcesIntent.AddResourceClicked -> onAddResourceClicked()
+            is ResourcesIntent.ResourceClicked -> onResourceClicked(intent)
         }
     }
 
@@ -52,11 +52,11 @@ class ResourcesViewModel(
         TODO("Not yet implemented")
     }
 
-    private fun onAddDestructionClicked() {
+    private fun onAddResourceClicked() {
         TODO("Not yet implemented")
     }
 
-    private fun onDestructionClicked(intent: ResourcesIntent.DestructionClicked) {
-        TODO("Not yet implemented")
+    private fun onResourceClicked(intent: ResourcesIntent.ResourceClicked) {
+        viewModelScope.emitSideEffect(ResourcesSideEffect.OpenResourceDetails(intent.id))
     }
 }

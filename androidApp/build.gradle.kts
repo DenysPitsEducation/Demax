@@ -54,6 +54,7 @@ dependencies {
     implementation(projects.featureAuthorization)
     implementation(projects.featureDestructionDetails)
     implementation(projects.featureDestructions)
+    implementation(projects.featureResourceDetails)
     implementation(projects.featureResources)
     implementation(projects.featureResponses)
 }

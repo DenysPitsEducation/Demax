@@ -46,7 +46,7 @@ fun ResourceComposable(
             .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
             .clickable {
-                onUserInteraction(ResourcesIntent.DestructionClicked(model.id))
+                onUserInteraction(ResourcesIntent.ResourceClicked(model.id))
             }
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),

@@ -40,6 +40,7 @@ import com.demax.feature.resources.mapper.ResourcesUiMapper
 import com.demax.feature.resources.model.ResourceUiModel
 import com.demax.feature.resources.model.ResourcesUiModel
 import com.demax.feature.resources.mvi.ResourcesIntent
+import com.demax.feature.resources.mvi.ResourcesSideEffect
 import com.demax.feature.resources.navigation.ResourcesRouter
 import org.koin.compose.koinInject
 
@@ -57,12 +58,10 @@ fun ResourcesScreen(navController: NavHostController) {
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
-        /*when (sideEffect) {
-            is ResourcesSideEffect.OpenMainScreen -> router.openMainScreen(navController)
-            is ResourcesSideEffect.OpenPasswordResetScreen -> router.openPasswordResetScreen(navController)
-            is ResourcesSideEffect.OpenRegistrationScreen -> router.openRegistrationScreen(navController)
+        when (sideEffect) {
+            is ResourcesSideEffect.OpenResourceDetails -> router.openResourceDetails(navController, sideEffect.id)
             is ResourcesSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
-        }*/
+        }
     }
 
     ResourcesContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
@@ -122,7 +121,7 @@ private fun ResourcesContent(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable {
-                        onUserInteraction(ResourcesIntent.AddDestructionClicked)
+                        onUserInteraction(ResourcesIntent.AddResourceClicked)
                     }
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 6.dp, vertical = 2.dp),

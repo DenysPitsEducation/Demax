@@ -29,6 +29,8 @@ import com.demax.feature.destruction.details.composable.DestructionDetailsScreen
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
 import com.demax.feature.destructions.navigation.DestructionsPayload
 import com.demax.feature.destructions.composable.DestructionsScreen
+import com.demax.feature.resource.details.composable.ResourceDetailsScreen
+import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
 import com.demax.feature.resources.composable.ResourcesScreen
 import com.demax.feature.resources.navigation.ResourcesPayload
 import com.demax.feature.responses.composable.ResponsesScreen
@@ -109,6 +111,9 @@ fun MainScreen() {
             }
             composable<DestructionsPayload> {
                 DestructionsScreen(navController)
+            }
+            composable<ResourceDetailsPayload> {
+                ResourceDetailsScreen(navController)
             }
             composable<ResourcesPayload> {
                 ResourcesScreen(navController)

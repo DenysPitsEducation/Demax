@@ -174,7 +174,7 @@ private fun DestructionDetailsContent(
         ) {
             Text(text = "Опис", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = model.destructionDate)
+            Text(text = model.description)
         }
         Spacer(modifier = Modifier.height(16.dp))
         VolunteerNeedsBlockComposable(model.volunteerNeedsBlock)

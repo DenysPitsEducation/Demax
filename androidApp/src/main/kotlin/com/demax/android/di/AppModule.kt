@@ -1,5 +1,6 @@
 package com.demax.android.di
 
+import android.content.res.Resources
 import androidx.navigation.NavController
 import com.demax.android.MainPayload
 import com.demax.feature.authorization.common.AuthorizationRouter
@@ -9,6 +10,8 @@ import com.demax.feature.authorization.registration.RegistrationPayload
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
 import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
 import com.demax.feature.destructions.navigation.DestructionsRouter
+import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
+import com.demax.feature.resource.details.navigation.ResourceDetailsRouter
 import com.demax.feature.resources.navigation.ResourcesRouter
 import com.demax.feature.responses.navigation.ResponsesRouter
 import org.koin.dsl.module
@@ -44,8 +47,15 @@ fun appModule() = module {
             }
         }
     }
+    factory<ResourceDetailsRouter> {
+        object : ResourceDetailsRouter {
+        }
+    }
     factory<ResourcesRouter> {
         object : ResourcesRouter {
+            override fun openResourceDetails(navController: NavController, id: Long) {
+                navController.navigate(ResourceDetailsPayload(id))
+            }
         }
     }
     factory<ResponsesRouter> {

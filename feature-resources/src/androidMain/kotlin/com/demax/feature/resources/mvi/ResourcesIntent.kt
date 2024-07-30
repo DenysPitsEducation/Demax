@@ -7,7 +7,7 @@ sealed interface ResourcesIntent {
 
     data object FilterClicked : ResourcesIntent
 
-    data object AddDestructionClicked : ResourcesIntent
+    data object AddResourceClicked : ResourcesIntent
 
-    data class DestructionClicked(val id: Long) : ResourcesIntent
+    data class ResourceClicked(val id: Long) : ResourcesIntent
 }
