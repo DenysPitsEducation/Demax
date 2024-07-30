@@ -10,6 +10,7 @@ import com.demax.feature.authorization.registration.RegistrationPayload
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
 import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
 import com.demax.feature.destructions.navigation.DestructionsRouter
+import com.demax.feature.profile.navigation.ProfileRouter
 import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
 import com.demax.feature.resource.details.navigation.ResourceDetailsRouter
 import com.demax.feature.resources.navigation.ResourcesRouter
@@ -45,6 +46,10 @@ fun appModule() = module {
             override fun openDestructionDetails(navController: NavController, id: Long) {
                 navController.navigate(DestructionDetailsPayload(id))
             }
+        }
+    }
+    factory<ProfileRouter> {
+        object : ProfileRouter {
         }
     }
     factory<ResourceDetailsRouter> {
