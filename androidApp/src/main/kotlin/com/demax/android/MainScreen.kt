@@ -33,6 +33,8 @@ import com.demax.feature.profile.composable.ProfileScreen
 import com.demax.feature.profile.navigation.ProfilePayload
 import com.demax.feature.resource.details.composable.ResourceDetailsScreen
 import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
+import com.demax.feature.resource.edit.composable.ResourceEditScreen
+import com.demax.feature.resource.edit.navigation.ResourceEditPayload
 import com.demax.feature.resources.composable.ResourcesScreen
 import com.demax.feature.resources.navigation.ResourcesPayload
 import com.demax.feature.responses.composable.ResponsesScreen
@@ -119,6 +121,9 @@ fun MainScreen() {
             }
             composable<ResourceDetailsPayload> {
                 ResourceDetailsScreen(navController)
+            }
+            composable<ResourceEditPayload> {
+                ResourceEditScreen(navController)
             }
             composable<ResourcesPayload> {
                 ResourcesScreen(navController)

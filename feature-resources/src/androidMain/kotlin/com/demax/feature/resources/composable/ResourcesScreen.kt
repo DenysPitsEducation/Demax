@@ -60,6 +60,7 @@ fun ResourcesScreen(navController: NavHostController) {
     ) { sideEffect ->
         when (sideEffect) {
             is ResourcesSideEffect.OpenResourceDetails -> router.openResourceDetails(navController, sideEffect.id)
+            is ResourcesSideEffect.OpenResourceEdit -> router.openResourceEdit(navController)
             is ResourcesSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }

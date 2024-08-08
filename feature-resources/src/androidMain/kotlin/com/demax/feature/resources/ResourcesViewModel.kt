@@ -53,7 +53,7 @@ class ResourcesViewModel(
     }
 
     private fun onAddResourceClicked() {
-        TODO("Not yet implemented")
+        viewModelScope.emitSideEffect(ResourcesSideEffect.OpenResourceEdit)
     }
 
     private fun onResourceClicked(intent: ResourcesIntent.ResourceClicked) {
