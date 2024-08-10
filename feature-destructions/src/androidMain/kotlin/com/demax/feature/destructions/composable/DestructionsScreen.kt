@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,14 +19,23 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,17 +46,19 @@ import androidx.navigation.NavHostController
 import com.demax.core.mvi.SideEffectLaunchedEffect
 import com.demax.core.ui.LocalSnackbarHostState
 import com.demax.core.ui.PreviewContainer
-import com.demax.feature.destructions.mvi.DestructionsIntent
-import com.demax.feature.destructions.navigation.DestructionsRouter
 import com.demax.feature.destructions.DestructionsViewModel
 import com.demax.feature.destructions.mapper.DestructionsUiMapper
 import com.demax.feature.destructions.model.DestructionItemUiModel
 import com.demax.feature.destructions.model.DestructionsUiModel
+import com.demax.feature.destructions.mvi.DestructionsIntent
 import com.demax.feature.destructions.mvi.DestructionsSideEffect
+import com.demax.feature.destructions.navigation.DestructionsRouter
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 internal typealias OnUserInteraction = (DestructionsIntent) -> Unit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DestructionsScreen(navController: NavHostController) {
     val viewModel: DestructionsViewModel = koinInject()
@@ -55,16 +67,151 @@ fun DestructionsScreen(navController: NavHostController) {
     val state = viewModel.uiState.collectAsState().value
     val uiModel = mapper.mapToUiModel(state)
     val snackbarHostState = LocalSnackbarHostState.current
+    val onUserInteraction: OnUserInteraction = { viewModel.onIntent(it) }
+    val scope = rememberCoroutineScope()
+    val sortingBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortingBottomSheet by remember { mutableStateOf(false) }
+    val filterBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showFilterBottomSheet by remember { mutableStateOf(false) }
 
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
         when (sideEffect) {
-            is DestructionsSideEffect.OpenDestructionDetails -> router.openDestructionDetails(navController, sideEffect.id)
+            is DestructionsSideEffect.OpenDestructionDetails -> router.openDestructionDetails(
+                navController,
+                sideEffect.id
+            )
+
+            is DestructionsSideEffect.OpenSortBottomSheet -> {
+                showSortingBottomSheet = true
+                sortingBottomSheetState.show()
+            }
+
+            is DestructionsSideEffect.OpenFilterBottomSheet -> {
+                showFilterBottomSheet = true
+                filterBottomSheetState.show()
+            }
         }
     }
 
-    DestructionsContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
+    DestructionsContent(model = uiModel, onUserInteraction = onUserInteraction)
+
+    if (showSortingBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showSortingBottomSheet = false
+            },
+            sheetState = sortingBottomSheetState,
+            modifier = Modifier
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Сортувати",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                uiModel.sortUiModels.forEach { sortUiModel ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onUserInteraction(DestructionsIntent.SortItemClicked(sortUiModel.type))
+                            }
+                    ) {
+                        RadioButton(
+                            selected = sortUiModel.isSelected,
+                            onClick = {
+                                onUserInteraction(DestructionsIntent.SortItemClicked(sortUiModel.type))
+                            },
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(sortUiModel.title)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scope.launch {
+                            sortingBottomSheetState.hide()
+                            showSortingBottomSheet = false
+                        }
+                    }
+                ) {
+                    Text("Обрати сортування")
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
+    }
+
+    if (showFilterBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showFilterBottomSheet = false
+            },
+            sheetState = filterBottomSheetState,
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Фільтрувати",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                uiModel.filterUiModels.forEachIndexed { index, filter ->
+                    if (index != 0) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    Text(
+                        text = filter.title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    filter.options.forEach { filterOption ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onUserInteraction(DestructionsIntent.FilterOptionClicked(filterOption.type))
+                                }
+                        ) {
+                            Checkbox(
+                                checked = filterOption.isSelected,
+                                modifier = Modifier.size(40.dp),
+                                onCheckedChange = {
+                                    onUserInteraction(DestructionsIntent.FilterOptionClicked(filterOption.type))
+                                },
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(filterOption.title)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scope.launch {
+                            filterBottomSheetState.hide()
+                            showFilterBottomSheet = false
+                        }
+                    }
+                ) {
+                    Text("Обрати фільтр")
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
+    }
 }
 
 @Composable
@@ -83,20 +230,6 @@ private fun DestructionsContent(
             style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(20.dp))
-        OutlinedTextField(
-            value = model.searchInput,
-            onValueChange = {
-                onUserInteraction(DestructionsIntent.SearchInputChanged(it))
-            },
-            trailingIcon = {
-                Icon(Icons.Filled.Search, contentDescription = null)
-            },
-            placeholder = {
-                Text("Пошук за ключовими словами")
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(modifier = Modifier.height(12.dp))
         Row {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -170,7 +303,7 @@ private fun DestructionsContent(
 
 fun createDestructionItemUiModelsMock() = listOf(
     DestructionItemUiModel(
-        id = 4373,
+        id = "4373",
         imageUrl = "https://picsum.photos/300/200",
         buildingType = "житловий будинок",
         address = "вул Чорновола, 28",
@@ -194,7 +327,7 @@ fun createDestructionItemUiModelsMock() = listOf(
         )
     ),
     DestructionItemUiModel(
-        id = 8246,
+        id = "8246",
         imageUrl = "https://picsum.photos/300/200",
         buildingType = "медичний заклад",
         address = "вул Лобановського, 28",
@@ -225,7 +358,8 @@ private fun DestructionsContentPreview() {
     PreviewContainer {
         DestructionsContent(
             model = DestructionsUiModel(
-                searchInput = "",
+                sortUiModels = emptyList(),
+                filterUiModels = emptyList(),
                 showAddDestructionButton = true,
                 destructionItemUiModels = createDestructionItemUiModelsMock()
             ),

@@ -1,6 +1,7 @@
 package com.demax.android.di
 
 import androidx.navigation.NavController
+import com.demax.android.AppInitializer
 import com.demax.android.MainPayload
 import com.demax.feature.authorization.common.AuthorizationRouter
 import com.demax.feature.authorization.login.LoginPayload
@@ -16,9 +17,12 @@ import com.demax.feature.resource.edit.navigation.ResourceEditPayload
 import com.demax.feature.resource.edit.navigation.ResourceEditRouter
 import com.demax.feature.resources.navigation.ResourcesRouter
 import com.demax.feature.responses.navigation.ResponsesRouter
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 fun appModule() = module {
+    factoryOf(::AppInitializer)
+
     factory<AuthorizationRouter> {
         object : AuthorizationRouter {
             override fun openMainScreen(navController: NavController) {
@@ -44,7 +48,7 @@ fun appModule() = module {
     }
     factory<DestructionsRouter> {
         object : DestructionsRouter {
-            override fun openDestructionDetails(navController: NavController, id: Long) {
+            override fun openDestructionDetails(navController: NavController, id: String) {
                 navController.navigate(DestructionDetailsPayload(id))
             }
         }

@@ -3,7 +3,7 @@ package com.demax.feature.destructions.model
 import androidx.compose.ui.graphics.Color
 
 data class DestructionItemUiModel(
-    val id: Long,
+    val id: String,
     val imageUrl: String?,
     val buildingType: String,
     val address: String,

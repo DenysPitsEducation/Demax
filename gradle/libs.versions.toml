@@ -5,7 +5,7 @@ compose-activity = "1.8.0"
 compose-bom = "2024.06.00"
 compose-navigation = "2.8.0-beta05"
 compose-viewModel = "2.6.1"
-firebase-bom = "33.1.2"
+firebase-gitlive = "1.12.0"
 google-services = "4.4.2"
 koin-bom = "3.5.6"
 kotlin = "2.0.0"
@@ -26,8 +26,10 @@ compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewModel" }
-firebase-auth = { module = "com.google.firebase:firebase-auth" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-gitlive" }
+firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "firebase-gitlive" }
+firebase-firestore = { module = "dev.gitlive:firebase-firestore", version.ref = "firebase-gitlive" }
+firebase-storage = { module = "dev.gitlive:firebase-storage", version.ref = "firebase-gitlive" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-compose = { module = "io.insert-koin:koin-compose" }

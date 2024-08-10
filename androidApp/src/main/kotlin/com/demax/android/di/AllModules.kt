@@ -1,5 +1,6 @@
 package com.demax.android.di
 
+import com.demax.core.di.coreModule
 import com.demax.feature.authorization.common.di.featureAuthorizationModule
 import com.demax.feature.destruction.details.di.featureDestructionDetailsModule
 import com.demax.feature.destructions.di.featureDestructionsModule
@@ -11,6 +12,7 @@ import com.demax.feature.responses.di.featureResponsesModule
 
 fun getAllKoinModules() = listOf(
     appModule(),
+    coreModule(),
     featureAuthorizationModule(),
     featureDestructionDetailsModule(),
     featureDestructionsModule(),
