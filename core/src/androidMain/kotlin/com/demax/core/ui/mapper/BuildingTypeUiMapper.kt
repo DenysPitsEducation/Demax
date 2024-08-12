@@ -1,9 +1,8 @@
-package com.demax.feature.destructions.mapper
+package com.demax.core.ui.mapper
 
 import com.demax.core.domain.model.BuildingTypeDomainModel
-import com.demax.feature.destructions.domain.model.DestructionDomainModel
 
-internal class BuildingTypeUiMapper {
+class BuildingTypeUiMapper {
     fun mapToUiModel(buildingType: BuildingTypeDomainModel): String {
         return when (buildingType) {
             BuildingTypeDomainModel.RESIDENTIAL -> "Житловий"

@@ -1,43 +1,80 @@
 package com.demax.feature.destruction.details.mapper
 
 import androidx.compose.ui.graphics.Color
-import com.demax.core.utils.formatFractionalPart
+import com.demax.core.domain.model.StatusDomainModel
+import com.demax.core.ui.mapper.BuildingTypeUiMapper
 import com.demax.feature.destruction.details.domain.model.AmountDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionDetailsDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionStatisticsDomainModel
 import com.demax.feature.destruction.details.domain.model.NeedDomainModel
+import com.demax.feature.destruction.details.domain.model.ResourceHelpBottomSheetDomainModel
+import com.demax.feature.destruction.details.domain.model.VolunteerHelpBottomSheetDomainModel
 import com.demax.feature.destruction.details.model.DestructionDetailsUiModel
 import com.demax.feature.destruction.details.model.DestructionStatisticsUiModel
 import com.demax.feature.destruction.details.model.NeedUiModel
 import com.demax.feature.destruction.details.model.ProgressUiModel
+import com.demax.feature.destruction.details.model.ResourceHelpBottomSheetUiModel
+import com.demax.feature.destruction.details.model.ResourceNeedBottomSheetUiModel
 import com.demax.feature.destruction.details.model.ResourceNeedsBlockUiModel
+import com.demax.feature.destruction.details.model.VolunteerNeedBottomSheetUiModel
 import com.demax.feature.destruction.details.model.VolunteerNeedsBlockUiModel
+import com.demax.feature.destruction.details.model.VolunteerHelpBottomSheetUiModel
 import com.demax.feature.destruction.details.mvi.DestructionDetailsState
-import kotlinx.datetime.toJavaLocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.byUnicodePattern
 
-internal class DestructionDetailsUiMapper {
+internal class DestructionDetailsUiMapper(
+    private val buildingTypeUiMapper: BuildingTypeUiMapper,
+) {
 
-    fun mapToUiModel(state: DestructionDetailsState): DestructionDetailsUiModel? = state.run {
+    fun mapToDestructionDetailsUiModel(state: DestructionDetailsState): DestructionDetailsUiModel? = state.run {
         return state.destructionDetails?.toUiModel(state.isAdministrator)
     }
 
     private fun DestructionDetailsDomainModel.toUiModel(isAdministrator: Boolean): DestructionDetailsUiModel {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
         return DestructionDetailsUiModel(
             imageUrl = imageUrl,
             status = when (status) {
-                DestructionDetailsDomainModel.StatusDomainModel.ACTIVE -> "Активне"
-                DestructionDetailsDomainModel.StatusDomainModel.COMPLETED -> "Закрито"
+                StatusDomainModel.ACTIVE -> "Активне"
+                StatusDomainModel.COMPLETED -> "Закрито"
             },
-            buildingType = buildingType,
+            buildingType = buildingTypeUiMapper.mapToUiModel(buildingType),
             address = address,
             destructionStatistics = destructionStatistics.toUiModel(),
-            destructionDate = formatter.format(destructionDate.toJavaLocalDate()),
+            destructionDate = formatter.format(destructionDate),
             description = description,
             volunteerNeedsBlock = getVolunteerNeedsBlockUiModel(volunteerNeeds),
             resourceNeedsBlock = getResourceNeedsBlockUiModel(resourceNeeds, isAdministrator),
+        )
+    }
+
+    fun mapToVolunteerBottomSheetUiModel(model: VolunteerHelpBottomSheetDomainModel): VolunteerHelpBottomSheetUiModel = model.run {
+        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
+        return VolunteerHelpBottomSheetUiModel(
+            dateInputText = selectedDate?.let { formatter.format(it) },
+            needs = needs.map { need ->
+                VolunteerNeedBottomSheetUiModel(
+                    title = need.title,
+                    isSelected = need.isSelected,
+                )
+            },
+            isButtonEnabled = selectedDate != null && needs.any { it.isSelected },
+        )
+    }
+
+    fun mapToResourceBottomSheetUiModel(model: ResourceHelpBottomSheetDomainModel): ResourceHelpBottomSheetUiModel = model.run {
+        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
+        return ResourceHelpBottomSheetUiModel(
+            dateInputText = selectedDate?.let { formatter.format(it) },
+            needs = needs.map { need ->
+                ResourceNeedBottomSheetUiModel(
+                    title = need.title,
+                    quantity = need.quantity?.toString(),
+                    isSelected = need.isSelected,
+                )
+            },
+            isButtonEnabled = selectedDate != null && needs.any { it.isSelected },
         )
     }
 
@@ -55,7 +92,8 @@ internal class DestructionDetailsUiMapper {
                     name = need.name,
                     progress = getProgressUiModel(need.amount),
                 )
-            }
+            },
+            showHelpButton = needs.any { it.amount.totalAmount != it.amount.currentAmount },
         )
     }
 
@@ -67,6 +105,7 @@ internal class DestructionDetailsUiMapper {
                     progress = getProgressUiModel(need.amount),
                 )
             },
+            showHelpButton = needs.any { it.amount.totalAmount != it.amount.currentAmount },
             showAddResourcesButton = isAdministrator,
         )
     }

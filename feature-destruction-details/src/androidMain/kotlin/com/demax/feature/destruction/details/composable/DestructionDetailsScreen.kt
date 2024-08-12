@@ -2,10 +2,12 @@ package com.demax.feature.destruction.details.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,11 +17,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,36 +54,109 @@ import com.demax.feature.destruction.details.model.NeedUiModel
 import com.demax.feature.destruction.details.model.ProgressUiModel
 import com.demax.feature.destruction.details.model.ResourceNeedsBlockUiModel
 import com.demax.feature.destruction.details.model.VolunteerNeedsBlockUiModel
+import com.demax.feature.destruction.details.mvi.DestructionDetailsSideEffect
+import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 internal typealias OnUserInteraction = (DestructionDetailsIntent) -> Unit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DestructionDetailsScreen(navController: NavHostController) {
-    val viewModel: DestructionDetailsViewModel = koinInject()
+fun DestructionDetailsScreen(navController: NavHostController, payload: DestructionDetailsPayload) {
+    val viewModel: DestructionDetailsViewModel = koinInject(parameters = { parametersOf(payload) })
     val router: DestructionDetailsRouter = koinInject()
     val mapper: DestructionDetailsUiMapper = koinInject()
     val state = viewModel.uiState.collectAsState().value
-    val uiModel = mapper.mapToUiModel(state)
+    val uiModel = mapper.mapToDestructionDetailsUiModel(state)
+    val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
+    val onUserInteraction: OnUserInteraction = { viewModel.onIntent(it) }
+
+    val volunteerBottomSheetModel = state.volunteerHelpBottomSheet?.let {
+        mapper.mapToVolunteerBottomSheetUiModel(it)
+    }
+    val volunteerHelpBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showVolunteerHelpBottomSheet by remember { mutableStateOf(false) }
+    val dismissVolunteerHelpBottomSheet: () -> Unit = {
+        scope.launch {
+            volunteerHelpBottomSheetState.hide()
+            showVolunteerHelpBottomSheet = false
+        }
+    }
+    val showVolunteerDatePickerDialog = remember { mutableStateOf(false) }
+
+    val resourceBottomSheetModel = state.resourceHelpBottomSheet?.let {
+        mapper.mapToResourceBottomSheetUiModel(it)
+    }
+    val resourceHelpBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showResourceHelpBottomSheet by remember { mutableStateOf(false) }
+    val dismissResourceHelpBottomSheet: () -> Unit = {
+        scope.launch {
+            resourceHelpBottomSheetState.hide()
+            showResourceHelpBottomSheet = false
+        }
+    }
+    val showResourceDatePickerDialog = remember { mutableStateOf(false) }
 
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
-        /*when (sideEffect) {
-            is DestructionsSideEffect.OpenMainScreen -> router.openMainScreen(navController)
-            is DestructionsSideEffect.OpenPasswordResetScreen -> router.openPasswordResetScreen(navController)
-            is DestructionsSideEffect.OpenRegistrationScreen -> router.openRegistrationScreen(navController)
-            is DestructionsSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
-        }*/
+        when (sideEffect) {
+            is DestructionDetailsSideEffect.OpenVolunteerHelpBottomSheet -> {
+                showVolunteerHelpBottomSheet = true
+                volunteerHelpBottomSheetState.show()
+            }
+            is DestructionDetailsSideEffect.OpenVolunteerHelpDatePicker -> {
+                showVolunteerDatePickerDialog.value = true
+            }
+            is DestructionDetailsSideEffect.ShowSnackbar -> scope.launch {
+                snackbarHostState.showSnackbar(sideEffect.text)
+            }
+            is DestructionDetailsSideEffect.OpenResourceHelpBottomSheet -> {
+                showResourceHelpBottomSheet = true
+                resourceHelpBottomSheetState.show()
+            }
+            is DestructionDetailsSideEffect.OpenResourceHelpDatePicker -> {
+                showResourceDatePickerDialog.value = true
+            }
+        }
     }
 
-    if (uiModel != null) {
-        DestructionDetailsContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
+    if (uiModel != null && volunteerBottomSheetModel != null) {
+        DestructionDetailsContent(model = uiModel, onUserInteraction = onUserInteraction)
     } else {
-        CircularProgressIndicator()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
+    if (showVolunteerHelpBottomSheet && volunteerBottomSheetModel != null) {
+        VolunteerHelpBottomSheet(
+            dismissAction = dismissVolunteerHelpBottomSheet,
+            bottomSheetState = volunteerHelpBottomSheetState,
+            uiModel = volunteerBottomSheetModel,
+            onUserInteraction = onUserInteraction,
+            showDatePickerDialog = showVolunteerDatePickerDialog
+        )
+    }
+
+    if (showResourceHelpBottomSheet && resourceBottomSheetModel != null) {
+        ResourceHelpBottomSheet(
+            dismissAction = dismissResourceHelpBottomSheet,
+            bottomSheetState = resourceHelpBottomSheetState,
+            uiModel = resourceBottomSheetModel,
+            onUserInteraction = onUserInteraction,
+            showDatePickerDialog = showResourceDatePickerDialog
+        )
     }
 }
+
+
 
 @Composable
 private fun DestructionDetailsContent(
@@ -177,15 +260,18 @@ private fun DestructionDetailsContent(
             Text(text = model.description)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        VolunteerNeedsBlockComposable(model.volunteerNeedsBlock)
+        VolunteerNeedsBlockComposable(model.volunteerNeedsBlock, onUserInteraction)
         Spacer(modifier = Modifier.height(16.dp))
-        ResourceNeedsBlockComposable(model.resourceNeedsBlock)
+        ResourceNeedsBlockComposable(model.resourceNeedsBlock, onUserInteraction)
         Spacer(modifier = Modifier.height(50.dp))
     }
 }
 
 @Composable
-private fun VolunteerNeedsBlockComposable(model: VolunteerNeedsBlockUiModel) {
+private fun VolunteerNeedsBlockComposable(
+    model: VolunteerNeedsBlockUiModel,
+    onUserInteraction: OnUserInteraction
+) {
     Column {
         Text(
             text = "Потреби у волонтерах (спеціалізації):",
@@ -196,20 +282,22 @@ private fun VolunteerNeedsBlockComposable(model: VolunteerNeedsBlockUiModel) {
             Spacer(modifier = Modifier.height(8.dp))
             NeedComposable(needModel)
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(
-            onClick = {
-                // TODO Pits:
-            },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Надати волонтерську допомогу")
+        if (model.showHelpButton) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    onUserInteraction(DestructionDetailsIntent.ProvideVolunteerHelpClicked)
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Надати волонтерську допомогу")
+            }
         }
     }
 }
 
 @Composable
-private fun ResourceNeedsBlockComposable(model: ResourceNeedsBlockUiModel) {
+private fun ResourceNeedsBlockComposable(model: ResourceNeedsBlockUiModel, onUserInteraction: OnUserInteraction) {
     Column {
         Text(
             text = "Потреби у ресурсах (запити):",
@@ -220,14 +308,16 @@ private fun ResourceNeedsBlockComposable(model: ResourceNeedsBlockUiModel) {
             Spacer(modifier = Modifier.height(8.dp))
             NeedComposable(needModel)
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(
-            onClick = {
-                // TODO Pits:
-            },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Надати допомогу у ресурсах")
+        if (model.showHelpButton) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    onUserInteraction(DestructionDetailsIntent.ProvideResourceHelpClicked)
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(text = "Надати допомогу у ресурсах")
+            }
         }
         if (model.showAddResourcesButton) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -312,6 +402,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
                 ),
             ),
         ),
+        showHelpButton = true,
     ),
     resourceNeedsBlock = ResourceNeedsBlockUiModel(
         needs = listOf(
@@ -325,6 +416,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
                 ),
             ),
         ),
+        showHelpButton = true,
         showAddResourcesButton = true,
     ),
 )

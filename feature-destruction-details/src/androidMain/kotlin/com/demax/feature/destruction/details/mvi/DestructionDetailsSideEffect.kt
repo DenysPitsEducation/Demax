@@ -1,8 +1,9 @@
 package com.demax.feature.destruction.details.mvi
 
 sealed interface DestructionDetailsSideEffect {
-    data object Open: DestructionDetailsSideEffect
-    data object OpenMainScreen : DestructionDetailsSideEffect
-    data object OpenRegistrationScreen : DestructionDetailsSideEffect
+    data object OpenVolunteerHelpBottomSheet : DestructionDetailsSideEffect
+    data object OpenVolunteerHelpDatePicker : DestructionDetailsSideEffect
+    data object OpenResourceHelpBottomSheet : DestructionDetailsSideEffect
+    data object OpenResourceHelpDatePicker : DestructionDetailsSideEffect
     data class ShowSnackbar(val text: String) : DestructionDetailsSideEffect
 }

@@ -1,6 +1,7 @@
 package com.demax.feature.destructions.mapper
 
 import androidx.compose.ui.graphics.Color
+import com.demax.core.domain.model.StatusDomainModel
 import com.demax.core.utils.formatFractionalPart
 import com.demax.feature.destructions.domain.model.DestructionDomainModel
 import com.demax.feature.destructions.domain.model.FilterOptionDomainModel
@@ -64,8 +65,8 @@ internal class DestructionsUiMapper(
 
                 is FilterOptionDomainModel.Type.Specialization -> type.specialization
                 is FilterOptionDomainModel.Type.Status -> when (type.status) {
-                    DestructionDomainModel.StatusDomainModel.ACTIVE -> "Активне"
-                    DestructionDomainModel.StatusDomainModel.COMPLETED -> "Виконане"
+                    StatusDomainModel.ACTIVE -> "Активне"
+                    StatusDomainModel.COMPLETED -> "Виконане"
                 }
             },
             isSelected = isSelected
@@ -96,14 +97,14 @@ internal class DestructionsUiMapper(
         )
     }
 
-    private fun DestructionDomainModel.StatusDomainModel.toUiModel(): DestructionItemUiModel.StatusUiModel {
+    private fun StatusDomainModel.toUiModel(): DestructionItemUiModel.StatusUiModel {
         return when (this) {
-            DestructionDomainModel.StatusDomainModel.ACTIVE -> DestructionItemUiModel.StatusUiModel(
+            StatusDomainModel.ACTIVE -> DestructionItemUiModel.StatusUiModel(
                 text = "Активне",
                 background = Color(0xFFF2F487)
             )
 
-            DestructionDomainModel.StatusDomainModel.COMPLETED -> DestructionItemUiModel.StatusUiModel(
+            StatusDomainModel.COMPLETED -> DestructionItemUiModel.StatusUiModel(
                 text = "Виконане",
                 background = Color(0xFFC6EB88)
             )
