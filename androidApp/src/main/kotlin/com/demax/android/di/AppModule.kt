@@ -1,6 +1,7 @@
 package com.demax.android.di
 
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.demax.android.AppInitializer
 import com.demax.android.MainPayload
 import com.demax.feature.authorization.common.AuthorizationRouter
@@ -44,6 +45,9 @@ fun appModule() = module {
     }
     factory<DestructionDetailsRouter> {
         object : DestructionDetailsRouter {
+            override fun openResourceEditScreen(navController: NavHostController) {
+                navController.navigate(ResourceEditPayload)
+            }
         }
     }
     factory<DestructionsRouter> {
@@ -67,7 +71,7 @@ fun appModule() = module {
     }
     factory<ResourcesRouter> {
         object : ResourcesRouter {
-            override fun openResourceDetails(navController: NavController, id: Long) {
+            override fun openResourceDetails(navController: NavController, id: String) {
                 navController.navigate(ResourceDetailsPayload(id))
             }
 

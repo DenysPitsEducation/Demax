@@ -8,9 +8,11 @@ import com.demax.feature.resource.details.domain.ResourceDetailsRepository
 import com.demax.feature.resource.details.mvi.ResourceDetailsIntent
 import com.demax.feature.resource.details.mvi.ResourceDetailsSideEffect
 import com.demax.feature.resource.details.mvi.ResourceDetailsState
+import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
 import kotlinx.coroutines.launch
 
 class ResourceDetailsViewModel(
+    private val payload: ResourceDetailsPayload,
     private val repository: ResourceDetailsRepository,
 ) : ViewModel(),
     Mvi<ResourceDetailsState, ResourceDetailsIntent, ResourceDetailsSideEffect> by
@@ -24,9 +26,9 @@ class ResourceDetailsViewModel(
 
     init {
         viewModelScope.launch {
-            repository.getDestructionDetails().onSuccess { destructionDetails ->
+            repository.getResourceDetails(payload.id).onSuccess { destructionDetails ->
                 updateUiState { copy(resourceDetails = destructionDetails) }
-            }
+            }.onFailure { it.printStackTrace() }
         }
     }
 

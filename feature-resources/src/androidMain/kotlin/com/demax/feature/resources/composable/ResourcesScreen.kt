@@ -149,7 +149,7 @@ private fun ResourcesContent(
 
 fun createResourceUiModelsMock() = listOf(
     ResourceUiModel(
-        id = 4373,
+        id = "4373",
         imageUrl = "https://picsum.photos/300/200",
         name = "Антисептичні серветки",
         category = "Медичні засоби",
@@ -165,7 +165,7 @@ fun createResourceUiModelsMock() = listOf(
         )
     ),
     ResourceUiModel(
-        id = 8246,
+        id = "8246",
         imageUrl = "https://picsum.photos/300/200",
         name = "Цегла",
         category = "Будівельні матеріали",

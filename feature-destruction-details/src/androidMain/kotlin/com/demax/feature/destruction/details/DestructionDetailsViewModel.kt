@@ -79,6 +79,7 @@ class DestructionDetailsViewModel(
         when (intent) {
             is DestructionDetailsIntent.ProvideVolunteerHelpClicked -> onProvideVolunteerHelpClicked()
             is DestructionDetailsIntent.ProvideResourceHelpClicked -> onProvideResourceHelpClicked()
+            is DestructionDetailsIntent.AddResourceClicked -> onAddResourceClicked()
 
             is VolunteerHelpBottomSheetIntent.DateChanged -> onVolunteerHelpDateChanged(intent)
             is VolunteerHelpBottomSheetIntent.DateInputClicked -> onVolunteerHelpDateInputClicked()
@@ -101,6 +102,10 @@ class DestructionDetailsViewModel(
 
     private fun onProvideResourceHelpClicked() {
         viewModelScope.emitSideEffect(DestructionDetailsSideEffect.OpenResourceHelpBottomSheet)
+    }
+
+    private fun onAddResourceClicked() {
+        viewModelScope.emitSideEffect(DestructionDetailsSideEffect.OpenResourceEditScreen)
     }
 
     private fun onVolunteerHelpDateChanged(intent: VolunteerHelpBottomSheetIntent.DateChanged) {

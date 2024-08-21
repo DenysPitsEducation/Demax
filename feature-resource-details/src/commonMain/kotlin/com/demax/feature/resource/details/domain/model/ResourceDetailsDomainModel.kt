@@ -1,17 +1,13 @@
 package com.demax.feature.resource.details.domain.model
 
+import com.demax.core.domain.model.ResourceCategoryDomainModel
+
 data class ResourceDetailsDomainModel(
-    val id: Long,
+    val id: String,
     val imageUrl: String?,
-    val status: StatusDomainModel,
     val name: String,
-    val category: String,
+    val category: ResourceCategoryDomainModel,
     val amount: AmountDomainModel,
     val description: String,
     val destruction: DestructionDomainModel,
-) {
-
-    enum class StatusDomainModel {
-        ACTIVE, COMPLETED
-    }
-}
+)

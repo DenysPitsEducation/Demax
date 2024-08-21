@@ -3,7 +3,7 @@ package com.demax.feature.resources.model
 import androidx.compose.ui.graphics.Color
 
 data class ResourceUiModel(
-    val id: Long,
+    val id: String,
     val imageUrl: String?,
     val name: String,
     val category: String,
@@ -17,6 +17,7 @@ data class ResourceUiModel(
         val text: String,
         val color: Color,
     )
+
     data class StatusUiModel(
         val text: String,
         val background: Color,

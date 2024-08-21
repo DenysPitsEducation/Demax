@@ -1,4 +1,4 @@
-package com.demax.feature.destruction.details.data.model
+package com.demax.core.data.model
 
 import kotlinx.serialization.Serializable
 

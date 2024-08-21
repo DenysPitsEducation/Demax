@@ -1,18 +1,22 @@
 package com.demax.feature.resources.mapper
 
 import androidx.compose.ui.graphics.Color
+import com.demax.core.domain.model.ResourceCategoryDomainModel
+import com.demax.core.ui.mapper.ResourceCategoryUiMapper
 import com.demax.feature.resources.domain.model.ResourceDomainModel
 import com.demax.feature.resources.model.ResourceUiModel
 import com.demax.feature.resources.model.ResourcesUiModel
 import com.demax.feature.resources.mvi.ResourcesState
 
-internal class ResourcesUiMapper {
+internal class ResourcesUiMapper(
+    private val categoryMapper: ResourceCategoryUiMapper,
+) {
 
     fun mapToUiModel(state: ResourcesState): ResourcesUiModel = state.run {
         return ResourcesUiModel(
             searchInput = searchInput,
             showAddDestructionButton = isAdministrator,
-            resourceUiModels = destructions.map { it.toUiModel() }
+            resourceUiModels = resources.map { it.toUiModel() }
         )
     }
 
@@ -21,9 +25,9 @@ internal class ResourcesUiMapper {
             id = id,
             imageUrl = imageUrl,
             name = name,
-            category = category,
+            category = categoryMapper.mapToUiModel(category),
             progress = getProgressUiModel(amount),
-            status = status.toUiModel()
+            status = amount.toUiModel()
         )
     }
 
@@ -37,14 +41,14 @@ internal class ResourcesUiMapper {
         )
     }
 
-    private fun ResourceDomainModel.StatusDomainModel.toUiModel(): ResourceUiModel.StatusUiModel {
-        return when (this) {
-            ResourceDomainModel.StatusDomainModel.ACTIVE -> ResourceUiModel.StatusUiModel(
+    private fun ResourceDomainModel.AmountDomainModel.toUiModel(): ResourceUiModel.StatusUiModel {
+        return when {
+            currentAmount < totalAmount -> ResourceUiModel.StatusUiModel(
                 text = "Активне",
                 background = Color(0xFFF2F487)
             )
 
-            ResourceDomainModel.StatusDomainModel.COMPLETED -> ResourceUiModel.StatusUiModel(
+            else -> ResourceUiModel.StatusUiModel(
                 text = "Виконане",
                 background = Color(0xFFC6EB88)
             )

@@ -2,14 +2,11 @@ package com.demax.feature.destructions.data
 
 import com.demax.core.data.mapper.BuildingTypeDomainMapper
 import com.demax.core.data.mapper.StatusDomainMapper
-import com.demax.feature.destructions.data.model.DestructionDataModel
+import com.demax.core.data.model.DestructionDataModel
 import com.demax.feature.destructions.domain.DestructionsRepository
 import com.demax.feature.destructions.domain.model.DestructionDomainModel
 import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.firestore.Direction
 import dev.gitlive.firebase.firestore.firestore
-import dev.gitlive.firebase.firestore.orderBy
-import dev.gitlive.firebase.firestore.startAfter
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.byUnicodePattern
 

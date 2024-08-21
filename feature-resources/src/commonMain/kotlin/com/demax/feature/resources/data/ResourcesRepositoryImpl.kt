@@ -1,28 +1,34 @@
 package com.demax.feature.resources.data
 
+import com.demax.feature.resources.data.model.ResourceDataModel
 import com.demax.feature.resources.domain.ResourcesRepository
+import com.demax.core.data.mapper.ResourceCategoryDomainMapper
 import com.demax.feature.resources.domain.model.ResourceDomainModel
-import kotlinx.datetime.LocalDate
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
 
-class ResourcesRepositoryImpl : ResourcesRepository {
+class ResourcesRepositoryImpl(
+    private val resourceCategoryMapper: ResourceCategoryDomainMapper,
+) : ResourcesRepository {
     override suspend fun getResources(): Result<List<ResourceDomainModel>> {
-        return Result.success(listOf(
-            ResourceDomainModel(
-                id = 4373,
-                imageUrl = "https://picsum.photos/300/200?random=1",
-                name = "Антисептичні серветки",
-                category = "Медичні засоби",
-                amount = ResourceDomainModel.AmountDomainModel(currentAmount = 3, totalAmount = 10),
-                status = ResourceDomainModel.StatusDomainModel.ACTIVE
+        return runCatching {
+            val collection = Firebase.firestore.collection("resources")
+            collection.get().documents.map { document ->
+                val resourceDataModel = document.data(ResourceDataModel.serializer())
+                resourceDataModel.toDomainModel(document.id)
+            }
+        }
+    }
+    private fun ResourceDataModel.toDomainModel(id: String): ResourceDomainModel {
+        return ResourceDomainModel(
+            id = id,
+            imageUrl = imageUrl,
+            name = name,
+            category = resourceCategoryMapper.mapToDomainModel(category),
+            amount = ResourceDomainModel.AmountDomainModel(
+                currentAmount = amount.currentAmount,
+                totalAmount = amount.totalAmount,
             ),
-            ResourceDomainModel(
-                id = 8246,
-                imageUrl = "https://picsum.photos/300/200?random=2",
-                name = "Цегла",
-                category = "Будівельні матеріали",
-                amount = ResourceDomainModel.AmountDomainModel(currentAmount = 5, totalAmount = 5),
-                status = ResourceDomainModel.StatusDomainModel.COMPLETED
-            ),
-        ))
+        )
     }
 }

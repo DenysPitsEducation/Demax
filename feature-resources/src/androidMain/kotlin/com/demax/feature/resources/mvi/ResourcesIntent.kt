@@ -9,5 +9,5 @@ sealed interface ResourcesIntent {
 
     data object AddResourceClicked : ResourcesIntent
 
-    data class ResourceClicked(val id: Long) : ResourcesIntent
+    data class ResourceClicked(val id: String) : ResourcesIntent
 }

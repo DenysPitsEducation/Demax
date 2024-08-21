@@ -2,10 +2,12 @@ package com.demax.feature.resource.details.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,14 +46,19 @@ import com.demax.feature.resource.details.model.DestructionUiModel
 import com.demax.feature.resource.details.model.ResourceDetailsUiModel
 import com.demax.feature.resource.details.mvi.ResourceDetailsIntent
 import com.demax.feature.resource.details.mvi.ResourceDetailsSideEffect
+import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
 import com.demax.feature.resource.details.navigation.ResourceDetailsRouter
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 internal typealias OnUserInteraction = (ResourceDetailsIntent) -> Unit
 
 @Composable
-fun ResourceDetailsScreen(navController: NavHostController) {
-    val viewModel: ResourceDetailsViewModel = koinInject()
+fun ResourceDetailsScreen(
+    navController: NavHostController,
+    payload: ResourceDetailsPayload,
+) {
+    val viewModel: ResourceDetailsViewModel = koinInject(parameters = { parametersOf(payload) })
     val router: ResourceDetailsRouter = koinInject()
     val mapper: ResourceDetailsUiMapper = koinInject()
     val state = viewModel.uiState.collectAsState().value
@@ -69,7 +76,12 @@ fun ResourceDetailsScreen(navController: NavHostController) {
     if (uiModel != null) {
         ResourceDetailsContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
     } else {
-        CircularProgressIndicator()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
 
@@ -170,7 +182,7 @@ private fun ResourceDetailsContent(
                 /*TODO*/
             },
             modifier = Modifier.fillMaxWidth(),
-            ) {
+        ) {
             Text(
                 text = "Надати допомогу"
             )

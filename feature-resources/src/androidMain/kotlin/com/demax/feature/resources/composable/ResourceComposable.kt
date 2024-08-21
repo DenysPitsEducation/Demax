@@ -34,7 +34,6 @@ import com.demax.core.ui.PreviewContainer
 import com.demax.feature.resources.model.ResourceUiModel
 import com.demax.feature.resources.mvi.ResourcesIntent
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ResourceComposable(
     model: ResourceUiModel,

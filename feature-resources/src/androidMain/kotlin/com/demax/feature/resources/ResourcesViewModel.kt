@@ -18,14 +18,14 @@ class ResourcesViewModel(
         ResourcesState(
             searchInput = "",
             isAdministrator = false,
-            destructions = listOf()
+            resources = listOf()
         )
     ) {
 
     init {
         viewModelScope.launch {
             repository.getResources().onSuccess { destructions ->
-                updateUiState { copy(destructions = destructions) }
+                updateUiState { copy(resources = destructions) }
             }
         }
     }

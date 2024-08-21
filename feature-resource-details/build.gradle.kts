@@ -42,6 +42,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(libs.firebase.auth)
+            implementation(libs.firebase.firestore)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization)
             implementation(projects.core)

@@ -121,6 +121,9 @@ fun DestructionDetailsScreen(navController: NavHostController, payload: Destruct
             is DestructionDetailsSideEffect.OpenResourceHelpDatePicker -> {
                 showResourceDatePickerDialog.value = true
             }
+            is DestructionDetailsSideEffect.OpenResourceEditScreen -> {
+                router.openResourceEditScreen(navController)
+            }
         }
     }
 
@@ -323,7 +326,7 @@ private fun ResourceNeedsBlockComposable(model: ResourceNeedsBlockUiModel, onUse
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
-                    // TODO Pits:
+                    onUserInteraction(DestructionDetailsIntent.AddResourceClicked)
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {

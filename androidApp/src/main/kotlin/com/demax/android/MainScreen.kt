@@ -48,8 +48,6 @@ fun MainScreen() {
         containerColor = MaterialTheme.colorScheme.surface,
         bottomBar = {
             NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
                 var selectedItem by remember { mutableIntStateOf(0) }
                 val items = listOf(
                     NavigationBarItemModel(
@@ -114,7 +112,7 @@ fun MainScreen() {
             composable<DestructionDetailsPayload> { backStackEntry ->
                 DestructionDetailsScreen(
                     navController = navController,
-                    payload = backStackEntry.toRoute()
+                    payload = backStackEntry.toRoute(),
                 )
             }
             composable<DestructionsPayload> {
@@ -123,8 +121,11 @@ fun MainScreen() {
             composable<ProfilePayload> {
                 ProfileScreen(navController)
             }
-            composable<ResourceDetailsPayload> {
-                ResourceDetailsScreen(navController)
+            composable<ResourceDetailsPayload> { backStackEntry ->
+                ResourceDetailsScreen(
+                    navController = navController,
+                    payload = backStackEntry.toRoute(),
+                )
             }
             composable<ResourceEditPayload> {
                 ResourceEditScreen(navController)

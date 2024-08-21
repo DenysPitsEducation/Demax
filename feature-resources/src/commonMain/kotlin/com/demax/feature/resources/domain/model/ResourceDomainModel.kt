@@ -1,19 +1,16 @@
 package com.demax.feature.resources.domain.model
 
+import com.demax.core.domain.model.ResourceCategoryDomainModel
+
 data class ResourceDomainModel(
-    val id: Long,
+    val id: String,
     val imageUrl: String?,
     val name: String,
-    val category: String,
+    val category: ResourceCategoryDomainModel,
     val amount: AmountDomainModel,
-    val status: StatusDomainModel,
 ) {
     data class AmountDomainModel(
         val currentAmount: Int,
         val totalAmount: Int,
     )
-
-    enum class StatusDomainModel {
-        ACTIVE, COMPLETED
-    }
 }
