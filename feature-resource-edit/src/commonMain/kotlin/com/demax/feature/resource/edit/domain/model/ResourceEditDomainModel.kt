@@ -1,17 +1,17 @@
 package com.demax.feature.resource.edit.domain.model
 
-data class ResourceEditDomainModel(
-    val id: Long,
-    val imageUrl: String?,
-    val status: StatusDomainModel,
-    val name: String,
-    val category: String,
-    val amount: Int,
-    val description: String,
-    val destruction: DestructionDomainModel,
-) {
+import com.demax.core.domain.model.ResourceCategoryDomainModel
+import dev.gitlive.firebase.storage.File
 
-    enum class StatusDomainModel {
-        ACTIVE, COMPLETED
-    }
-}
+data class ResourceEditDomainModel(
+    val id: String,
+    val imageUrl: String?,
+    val imageFile: File?,
+    val name: String?,
+    val category: ResourceCategoryDomainModel?,
+    val totalAmount: Int?,
+    val currentAmount: Int?,
+    val description: String?,
+    val availableDestructions: List<DestructionDomainModel>,
+    val selectedDestruction: DestructionDomainModel?,
+)

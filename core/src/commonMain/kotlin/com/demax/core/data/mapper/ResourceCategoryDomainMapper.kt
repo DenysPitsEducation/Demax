@@ -16,4 +16,18 @@ class ResourceCategoryDomainMapper {
             else -> ResourceCategoryDomainModel.OTHER
         }
     }
+
+    fun mapToDataModel(category: ResourceCategoryDomainModel): String {
+        return when (category) {
+            ResourceCategoryDomainModel.MEDICAL_PRODUCTS -> "medical_products"
+            ResourceCategoryDomainModel.FOOD -> "food"
+            ResourceCategoryDomainModel.CLOTHES -> "clothes"
+            ResourceCategoryDomainModel.PERSONAL_CARE -> "personal_care"
+            ResourceCategoryDomainModel.TOOLS -> "tools"
+            ResourceCategoryDomainModel.RESCUE_EQUIPMENT -> "rescue_equipment"
+            ResourceCategoryDomainModel.VEHICLES_AND_FUEL -> "vehicles_and_fuel"
+            ResourceCategoryDomainModel.ELECTRONIC_DEVICES -> "electronic_devices"
+            ResourceCategoryDomainModel.OTHER -> "other"
+        }
+    }
 }

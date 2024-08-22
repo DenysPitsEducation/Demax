@@ -1,6 +1,6 @@
 package com.demax.feature.resources.data
 
-import com.demax.feature.resources.data.model.ResourceDataModel
+import com.demax.core.data.model.ResourceDataModel
 import com.demax.feature.resources.domain.ResourcesRepository
 import com.demax.core.data.mapper.ResourceCategoryDomainMapper
 import com.demax.feature.resources.domain.model.ResourceDomainModel

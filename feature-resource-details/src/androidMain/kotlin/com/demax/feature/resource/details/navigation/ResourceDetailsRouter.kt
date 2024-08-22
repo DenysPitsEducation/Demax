@@ -1,5 +1,7 @@
 package com.demax.feature.resource.details.navigation
 
-interface ResourceDetailsRouter {
+import androidx.navigation.NavController
 
+interface ResourceDetailsRouter {
+    fun openResourceEditScreen(navController: NavController, resourceId: String)
 }

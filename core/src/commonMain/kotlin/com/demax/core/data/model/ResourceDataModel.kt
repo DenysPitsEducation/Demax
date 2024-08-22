@@ -1,6 +1,5 @@
-package com.demax.feature.resources.data.model
+package com.demax.core.data.model
 
-import com.demax.core.data.model.AmountDataModel
 import kotlinx.serialization.Serializable
 
 @Serializable

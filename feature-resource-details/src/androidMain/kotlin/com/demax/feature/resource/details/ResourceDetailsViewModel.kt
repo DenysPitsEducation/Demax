@@ -34,31 +34,16 @@ class ResourceDetailsViewModel(
 
     override fun onIntent(intent: ResourceDetailsIntent) {
         when (intent) {
-            is ResourceDetailsIntent.SearchInputChanged -> onSearchInputChanged(intent)
-            is ResourceDetailsIntent.SortClicked -> onSortClicked()
-            is ResourceDetailsIntent.FilterClicked -> onFilterClicked()
-            is ResourceDetailsIntent.AddResourceClicked -> onAddResourceClicked()
-            is ResourceDetailsIntent.ResourceClicked -> onResourceClicked(intent)
+            is ResourceDetailsIntent.ModifyResourceClicked -> onModifyResourceClicked()
+            is ResourceDetailsIntent.ProvideHelpClicked -> onProvideHelpClicked()
         }
     }
 
-    private fun onSearchInputChanged(intent: ResourceDetailsIntent.SearchInputChanged) {
-        //updateUiState { copy(searchInput = intent.input) }
+    private fun onModifyResourceClicked() {
+        viewModelScope.emitSideEffect(ResourceDetailsSideEffect.OpenResourceEditScreen)
     }
 
-    private fun onSortClicked() {
-        TODO("Not yet implemented")
-    }
-
-    private fun onFilterClicked() {
-        TODO("Not yet implemented")
-    }
-
-    private fun onAddResourceClicked() {
-        TODO("Not yet implemented")
-    }
-
-    private fun onResourceClicked(intent: ResourceDetailsIntent.ResourceClicked) {
-        TODO("Not yet implemented")
+    private fun onProvideHelpClicked() {
+        viewModelScope.emitSideEffect(ResourceDetailsSideEffect.OpenResourceHelpBottomSheet)
     }
 }

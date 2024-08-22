@@ -2,7 +2,7 @@ package com.demax.feature.resource.details.data
 
 import com.demax.core.data.mapper.ResourceCategoryDomainMapper
 import com.demax.core.data.model.DestructionDataModel
-import com.demax.feature.resource.details.data.model.ResourceDetailsDataModel
+import com.demax.core.data.model.ResourceDetailsDataModel
 import com.demax.feature.resource.details.domain.ResourceDetailsRepository
 import com.demax.feature.resource.details.domain.model.AmountDomainModel
 import com.demax.feature.resource.details.domain.model.DestructionDomainModel
@@ -42,11 +42,11 @@ class ResourceDetailsRepositoryImpl(
                 totalAmount = amount.totalAmount,
             ),
             description = description,
-            destruction = destruction.toUiModel()
+            destruction = destruction.toDomainModel()
         )
     }
 
-    private fun DestructionDataModel.toUiModel(): DestructionDomainModel {
+    private fun DestructionDataModel.toDomainModel(): DestructionDomainModel {
         val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
         return DestructionDomainModel(
             imageUrl = imageUrl,

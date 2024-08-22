@@ -127,8 +127,11 @@ fun MainScreen() {
                     payload = backStackEntry.toRoute(),
                 )
             }
-            composable<ResourceEditPayload> {
-                ResourceEditScreen(navController)
+            composable<ResourceEditPayload> { backStackEntry ->
+                ResourceEditScreen(
+                    navController = navController,
+                    payload = backStackEntry.toRoute(),
+                )
             }
             composable<ResourcesPayload> {
                 ResourcesScreen(navController)

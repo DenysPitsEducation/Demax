@@ -46,7 +46,7 @@ fun appModule() = module {
     factory<DestructionDetailsRouter> {
         object : DestructionDetailsRouter {
             override fun openResourceEditScreen(navController: NavHostController) {
-                navController.navigate(ResourceEditPayload)
+                navController.navigate(ResourceEditPayload(resourceId = null))
             }
         }
     }
@@ -63,6 +63,9 @@ fun appModule() = module {
     }
     factory<ResourceDetailsRouter> {
         object : ResourceDetailsRouter {
+            override fun openResourceEditScreen(navController: NavController, resourceId: String) {
+                navController.navigate(ResourceEditPayload(resourceId))
+            }
         }
     }
     factory<ResourceEditRouter> {
@@ -76,7 +79,7 @@ fun appModule() = module {
             }
 
             override fun openResourceEdit(navController: NavController) {
-                navController.navigate(ResourceEditPayload)
+                navController.navigate(ResourceEditPayload(resourceId = null))
             }
         }
     }

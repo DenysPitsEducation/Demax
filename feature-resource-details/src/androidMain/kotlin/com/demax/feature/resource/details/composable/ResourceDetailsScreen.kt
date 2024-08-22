@@ -69,6 +69,8 @@ fun ResourceDetailsScreen(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
         when (sideEffect) {
+            is ResourceDetailsSideEffect.OpenResourceEditScreen -> router.openResourceEditScreen(navController, payload.id)
+            is ResourceDetailsSideEffect.OpenResourceHelpBottomSheet -> { /* todo */ }
             is ResourceDetailsSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }
@@ -179,7 +181,7 @@ private fun ResourceDetailsContent(
         Spacer(modifier = Modifier.height(8.dp))
         Button(
             onClick = {
-                /*TODO*/
+                onUserInteraction(ResourceDetailsIntent.ProvideHelpClicked)
             },
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -190,7 +192,7 @@ private fun ResourceDetailsContent(
         if (model.showEditButton) {
             Button(
                 onClick = {
-                    /*TODO*/
+                    onUserInteraction(ResourceDetailsIntent.ModifyResourceClicked)
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {

@@ -5,17 +5,13 @@ import com.demax.feature.destruction.details.data.model.DestructionDetailsDataMo
 import com.demax.feature.destruction.details.data.model.DestructionStatisticsDataModel
 import com.demax.feature.destruction.details.data.model.NeedDataModel
 import com.demax.core.data.model.DestructionDataModel
-import com.demax.feature.resource.details.data.model.ResourceDetailsDataModel
-import com.demax.feature.resource.details.domain.model.AmountDomainModel
-import com.demax.feature.resource.details.domain.model.DestructionDomainModel
-import com.demax.feature.resource.details.domain.model.ResourceDetailsDomainModel
-import com.demax.feature.resources.data.model.ResourceDataModel
+import com.demax.core.data.model.ResourceDetailsDataModel
+import com.demax.core.data.model.ResourceDataModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class AppInitializer {
     fun initialize() {
