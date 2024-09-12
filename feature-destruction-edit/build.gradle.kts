@@ -20,7 +20,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
-            baseName = "feature-resource-edit"
+            baseName = "feature-destruction-edit"
             isStatic = true
         }
     }
@@ -59,7 +59,7 @@ dependencies {
 }
 
 android {
-    namespace = "com.demax.feature.resource.edit"
+    namespace = "com.demax.feature.destruction.edit"
     compileSdk = 34
     defaultConfig {
         minSdk = 24

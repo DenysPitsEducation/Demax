@@ -1,9 +1,9 @@
 package com.demax.android
 
 import com.demax.core.data.model.AmountDataModel
-import com.demax.feature.destruction.details.data.model.DestructionDetailsDataModel
-import com.demax.feature.destruction.details.data.model.DestructionStatisticsDataModel
-import com.demax.feature.destruction.details.data.model.NeedDataModel
+import com.demax.core.data.model.DestructionDetailsDataModel
+import com.demax.core.data.model.DestructionStatisticsDataModel
+import com.demax.core.data.model.NeedDataModel
 import com.demax.core.data.model.DestructionDataModel
 import com.demax.core.data.model.ResourceDetailsDataModel
 import com.demax.core.data.model.ResourceDataModel

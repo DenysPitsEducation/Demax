@@ -3,6 +3,7 @@ package com.demax.android.di
 import com.demax.core.di.coreModule
 import com.demax.feature.authorization.common.di.featureAuthorizationModule
 import com.demax.feature.destruction.details.di.featureDestructionDetailsModule
+import com.demax.feature.destruction.edit.di.featureDestructionEditModule
 import com.demax.feature.destructions.di.featureDestructionsModule
 import com.demax.feature.profile.di.featureProfileModule
 import com.demax.feature.resource.details.di.featureResourceDetailsModule
@@ -15,6 +16,7 @@ fun getAllKoinModules() = listOf(
     coreModule(),
     featureAuthorizationModule(),
     featureDestructionDetailsModule(),
+    featureDestructionEditModule(),
     featureDestructionsModule(),
     featureProfileModule(),
     featureResourceDetailsModule(),

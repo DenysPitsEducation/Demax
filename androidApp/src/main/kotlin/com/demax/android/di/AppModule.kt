@@ -10,6 +10,8 @@ import com.demax.feature.authorization.passwordReset.PasswordResetPayload
 import com.demax.feature.authorization.registration.RegistrationPayload
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
 import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
+import com.demax.feature.destruction.edit.navigation.DestructionEditPayload
+import com.demax.feature.destruction.edit.navigation.DestructionEditRouter
 import com.demax.feature.destructions.navigation.DestructionsRouter
 import com.demax.feature.profile.navigation.ProfileRouter
 import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
@@ -50,8 +52,16 @@ fun appModule() = module {
             }
         }
     }
+    factory<DestructionEditRouter> {
+        object : DestructionEditRouter {
+        }
+    }
     factory<DestructionsRouter> {
         object : DestructionsRouter {
+            override fun openDestructionEditScreen(navController: NavController) {
+                navController.navigate(DestructionEditPayload(destructionId = null))
+            }
+
             override fun openDestructionDetails(navController: NavController, id: String) {
                 navController.navigate(DestructionDetailsPayload(id))
             }

@@ -2,9 +2,9 @@ package com.demax.feature.destruction.details.data
 
 import com.demax.core.data.mapper.BuildingTypeDomainMapper
 import com.demax.core.data.mapper.StatusDomainMapper
-import com.demax.feature.destruction.details.data.model.DestructionDetailsDataModel
-import com.demax.feature.destruction.details.data.model.DestructionStatisticsDataModel
-import com.demax.feature.destruction.details.data.model.NeedDataModel
+import com.demax.core.data.model.DestructionDetailsDataModel
+import com.demax.core.data.model.DestructionStatisticsDataModel
+import com.demax.core.data.model.NeedDataModel
 import com.demax.feature.destruction.details.domain.DestructionDetailsRepository
 import com.demax.feature.destruction.details.domain.model.AmountDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionDetailsDomainModel

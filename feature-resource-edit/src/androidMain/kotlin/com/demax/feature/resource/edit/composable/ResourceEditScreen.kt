@@ -79,7 +79,6 @@ fun ResourceEditScreen(navController: NavHostController, payload: ResourceEditPa
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
         when (sideEffect) {
-            is ResourceEditSideEffect.OpenPhotoPicker -> TODO()
             is ResourceEditSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }

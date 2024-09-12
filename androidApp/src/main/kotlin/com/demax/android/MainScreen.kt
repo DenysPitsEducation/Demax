@@ -28,6 +28,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.demax.feature.destruction.details.composable.DestructionDetailsScreen
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
+import com.demax.feature.destruction.edit.composable.DestructionEditScreen
+import com.demax.feature.destruction.edit.navigation.DestructionEditPayload
 import com.demax.feature.destructions.navigation.DestructionsPayload
 import com.demax.feature.destructions.composable.DestructionsScreen
 import com.demax.feature.profile.composable.ProfileScreen
@@ -111,6 +113,12 @@ fun MainScreen() {
         ) {
             composable<DestructionDetailsPayload> { backStackEntry ->
                 DestructionDetailsScreen(
+                    navController = navController,
+                    payload = backStackEntry.toRoute(),
+                )
+            }
+            composable<DestructionEditPayload> { backStackEntry ->
+                DestructionEditScreen(
                     navController = navController,
                     payload = backStackEntry.toRoute(),
                 )

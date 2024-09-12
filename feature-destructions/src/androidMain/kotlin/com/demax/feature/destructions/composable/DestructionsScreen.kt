@@ -78,6 +78,8 @@ fun DestructionsScreen(navController: NavHostController) {
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
         when (sideEffect) {
+            is DestructionsSideEffect.OpenDestructionEditScreen -> router.openDestructionEditScreen(navController)
+
             is DestructionsSideEffect.OpenDestructionDetails -> router.openDestructionDetails(
                 navController,
                 sideEffect.id

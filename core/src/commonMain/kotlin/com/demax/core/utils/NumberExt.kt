@@ -24,6 +24,8 @@ fun Double.formatFractionalPart(): String {
     return "$integerDigits$formattedFloatPart"
 }
 
+fun Float.formatFractionalPart() = toDouble().formatFractionalPart()
+
 fun Double.round(digitsAfterPoint: Int): Double {
     val helperNumber = 10.0.pow(digitsAfterPoint)
     return round(this * helperNumber) / helperNumber

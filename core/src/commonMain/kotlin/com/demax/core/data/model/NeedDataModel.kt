@@ -1,6 +1,5 @@
-package com.demax.feature.destruction.details.data.model
+package com.demax.core.data.model
 
-import com.demax.core.data.model.AmountDataModel
 import kotlinx.serialization.Serializable
 
 @Serializable

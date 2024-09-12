@@ -118,7 +118,7 @@ internal class DestructionsViewModel(
     }
 
     private fun onAddDestructionClicked() {
-
+        viewModelScope.emitSideEffect(DestructionsSideEffect.OpenDestructionEditScreen)
     }
 
     private fun onDestructionClicked(intent: DestructionsIntent.DestructionClicked) {

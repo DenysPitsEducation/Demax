@@ -21,4 +21,24 @@ class BuildingTypeDomainMapper {
             else -> BuildingTypeDomainModel.UNSPECIFIED
         }
     }
+
+    fun mapToDataModel(domainModel: BuildingTypeDomainModel): String {
+        return when (domainModel) {
+            BuildingTypeDomainModel.RESIDENTIAL -> "residential"
+            BuildingTypeDomainModel.MEDICAL_INSTITUTION -> "medical_institution"
+            BuildingTypeDomainModel.EDUCATIONAL_INSTITUTION -> "educational_institution"
+            BuildingTypeDomainModel.SHOPPING_CENTER -> "shopping_center"
+            BuildingTypeDomainModel.OFFICE_BUILDING -> "office_building"
+            BuildingTypeDomainModel.TRANSPORTATION_INFRASTRUCTURE -> "transportation_infrastructure"
+            BuildingTypeDomainModel.WAREHOUSE_BUILDING -> "warehouse_building"
+            BuildingTypeDomainModel.PARKING_LOT -> "parking_lot"
+            BuildingTypeDomainModel.RELIGIOUS_INSTITUTION -> "religious_institution"
+            BuildingTypeDomainModel.CULTURAL_INSTITUTION -> "cultural_institution"
+            BuildingTypeDomainModel.CATERING_FACILITY -> "catering_facility"
+            BuildingTypeDomainModel.ENTERTAINMENT_COMPLEX -> "entertainment_complex"
+            BuildingTypeDomainModel.SPORTS_FACILITY -> "sports_facility"
+            else -> "unspecified"
+        }
+    }
+
 }
