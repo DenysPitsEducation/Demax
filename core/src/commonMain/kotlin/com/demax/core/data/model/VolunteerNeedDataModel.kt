@@ -3,7 +3,7 @@ package com.demax.core.data.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NeedDataModel(
+data class VolunteerNeedDataModel(
     val name: String,
     val amount: AmountDataModel,
 )

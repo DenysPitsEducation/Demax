@@ -1,47 +1,77 @@
 package com.demax.feature.destruction.details.data
 
 import com.demax.core.data.mapper.BuildingTypeDomainMapper
-import com.demax.core.data.mapper.StatusDomainMapper
-import com.demax.core.data.model.DestructionDetailsDataModel
+import com.demax.core.data.model.DestructionDataModel
 import com.demax.core.data.model.DestructionStatisticsDataModel
-import com.demax.core.data.model.NeedDataModel
+import com.demax.core.data.model.ResourceDataModel
+import com.demax.core.data.model.VolunteerNeedDataModel
+import com.demax.core.domain.model.StatusDomainModel
 import com.demax.feature.destruction.details.domain.DestructionDetailsRepository
 import com.demax.feature.destruction.details.domain.model.AmountDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionDetailsDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionStatisticsDomainModel
 import com.demax.feature.destruction.details.domain.model.NeedDomainModel
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.FieldPath
 import dev.gitlive.firebase.firestore.firestore
+import dev.gitlive.firebase.firestore.where
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.byUnicodePattern
 
 class DestructionDetailsRepositoryImpl(
     private val buildingTypeMapper: BuildingTypeDomainMapper,
-    private val statusMapper: StatusDomainMapper,
 ) : DestructionDetailsRepository {
     override suspend fun getDestructionDetails(id: String): Result<DestructionDetailsDomainModel> {
         return runCatching {
-            val collection = Firebase.firestore.collection("destruction_details")
-            val document = collection.document(id).get()
-            val dataModel = document.data(DestructionDetailsDataModel.serializer())
-            dataModel.toDomainModel(id)
+            val destructionsCollection = Firebase.firestore.collection("destructions")
+            val destructionDocument = destructionsCollection.document(id).get()
+            val destructionDataModel = destructionDocument.data(DestructionDataModel.serializer())
+            val resourcesCollection = Firebase.firestore.collection("resources")
+            val resourceDocuments = resourcesCollection.where {
+                FieldPath.documentId inArray destructionDataModel.resourceNeeds
+            }.get().documents
+            val resources = resourceDocuments.map { document ->
+                document.data(ResourceDataModel.serializer())
+            }
+            destructionDataModel.toDomainModel(id, resources)
         }
     }
 
-    private fun DestructionDetailsDataModel.toDomainModel(id: String): DestructionDetailsDomainModel {
+    private fun DestructionDataModel.toDomainModel(
+        id: String,
+        resources: List<ResourceDataModel>
+    ): DestructionDetailsDomainModel {
         val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
+        val volunteerNeeds = volunteerNeeds.map { it.toDomainModel() }
+        val resourceNeeds = resources.map { resource ->
+            NeedDomainModel(
+                name = resource.name,
+                amount = AmountDomainModel(
+                    currentAmount = resource.amount.currentAmount,
+                    totalAmount = resource.amount.totalAmount,
+                ),
+            )
+        }
         return DestructionDetailsDomainModel(
             id = id,
             imageUrl = imageUrl,
-            status = statusMapper.mapToDomainModel(status),
+            status = getStatus(volunteerNeeds, resourceNeeds),
             buildingType = buildingTypeMapper.mapToDomainModel(buildingType),
             address = address,
             destructionStatistics = destructionStatistics.toDomainModel(),
             destructionDate = formatter.parse(destructionDate),
             description = description,
-            volunteerNeeds = volunteerNeeds.map { it.toDomainModel() },
-            resourceNeeds = resourceNeeds.map { it.toDomainModel() },
+            volunteerNeeds = volunteerNeeds,
+            resourceNeeds = resourceNeeds,
         )
+    }
+
+    private fun getStatus(volunteerNeeds: List<NeedDomainModel>, resourceNeeds: List<NeedDomainModel>): StatusDomainModel {
+        return if ((volunteerNeeds + resourceNeeds).any { it.amount.currentAmount < it.amount.totalAmount }) {
+            StatusDomainModel.ACTIVE
+        } else {
+            StatusDomainModel.COMPLETED
+        }
     }
 
     private fun DestructionStatisticsDataModel.toDomainModel(): DestructionStatisticsDomainModel {
@@ -51,7 +81,7 @@ class DestructionDetailsRepositoryImpl(
         )
     }
 
-    private fun NeedDataModel.toDomainModel(): NeedDomainModel {
+    private fun VolunteerNeedDataModel.toDomainModel(): NeedDomainModel {
         return NeedDomainModel(
             name = name,
             amount = AmountDomainModel(

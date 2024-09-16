@@ -8,4 +8,6 @@ data class ResourceDataModel(
     val name: String,
     val category: String,
     val amount: AmountDataModel,
+    val description: String,
+    val destructionId: String,
 )

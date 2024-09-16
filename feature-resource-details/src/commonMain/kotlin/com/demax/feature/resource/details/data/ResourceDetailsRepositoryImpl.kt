@@ -2,7 +2,7 @@ package com.demax.feature.resource.details.data
 
 import com.demax.core.data.mapper.ResourceCategoryDomainMapper
 import com.demax.core.data.model.DestructionDataModel
-import com.demax.core.data.model.ResourceDetailsDataModel
+import com.demax.core.data.model.ResourceDataModel
 import com.demax.feature.resource.details.domain.ResourceDetailsRepository
 import com.demax.feature.resource.details.domain.model.AmountDomainModel
 import com.demax.feature.resource.details.domain.model.DestructionDomainModel
@@ -19,9 +19,9 @@ class ResourceDetailsRepositoryImpl(
         return runCatching {
             val database = Firebase.firestore
 
-            val resourceDetailsCollection = database.collection("resource_details")
-            val resourceDocument = resourceDetailsCollection.document(id).get()
-            val resourceDataModel = resourceDocument.data(ResourceDetailsDataModel.serializer())
+            val resourcesCollection = database.collection("resources")
+            val resourceDocument = resourcesCollection.document(id).get()
+            val resourceDataModel = resourceDocument.data(ResourceDataModel.serializer())
 
             val destructionsCollection = database.collection("destructions")
             val destructionDocument = destructionsCollection.document(resourceDataModel.destructionId).get()
@@ -31,7 +31,7 @@ class ResourceDetailsRepositoryImpl(
         }
     }
 
-    private fun ResourceDetailsDataModel.toDomainModel(resourceId: String, destruction: DestructionDataModel): ResourceDetailsDomainModel {
+    private fun ResourceDataModel.toDomainModel(resourceId: String, destruction: DestructionDataModel): ResourceDetailsDomainModel {
         return ResourceDetailsDomainModel(
             id = resourceId,
             imageUrl = imageUrl,

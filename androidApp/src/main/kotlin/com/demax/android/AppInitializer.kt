@@ -1,11 +1,9 @@
 package com.demax.android
 
 import com.demax.core.data.model.AmountDataModel
-import com.demax.core.data.model.DestructionDetailsDataModel
 import com.demax.core.data.model.DestructionStatisticsDataModel
-import com.demax.core.data.model.NeedDataModel
+import com.demax.core.data.model.VolunteerNeedDataModel
 import com.demax.core.data.model.DestructionDataModel
-import com.demax.core.data.model.ResourceDetailsDataModel
 import com.demax.core.data.model.ResourceDataModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
@@ -17,53 +15,16 @@ class AppInitializer {
     fun initialize() {
         CoroutineScope(Dispatchers.IO).launch {
             // initDestructions()
-            // initDestructionDetails()
             // initResources()
-            // initResourceDetails()
         }
     }
 
     private suspend fun initDestructions() {
         val database = Firebase.firestore
-        val destructionsCollection = database.collection("destructions")
-        val destructions = listOf(
-            DestructionDataModel(
-                imageUrl = "https://picsum.photos/seed/destruction0/200/200",
-                buildingType = "residential",
-                address = "вул Чорновола, 28",
-                destructionDate = "2024-07-08",
-                resourceProgress = 0.3,
-                volunteerProgress = 1.0,
-                specializations = listOf("Психотерапія", "Педіатрія"),
-                status = "active",
-                priority = 7,
-            ),
-            DestructionDataModel(
-                imageUrl = "https://picsum.photos/seed/destruction1/300/200",
-                buildingType = "medical_institution",
-                address = "вул Лобановського, 28",
-                destructionDate = "2022-07-08",
-                resourceProgress = 1.0,
-                volunteerProgress = 0.3,
-                specializations = listOf("Психотерапія", "Педіатрія"),
-                status = "completed",
-                priority = 10,
-            ),
-        )
-        database.batch().apply {
-            destructions.forEachIndexed { index, destruction ->
-                set(destructionsCollection.document(index.toString()), destruction)
-            }
-        }.commit()
-    }
-
-    private suspend fun initDestructionDetails() {
-        val database = Firebase.firestore
-        val collection = database.collection("destruction_details")
+        val collection = database.collection("destructions")
         val models = listOf(
-            DestructionDetailsDataModel(
+            DestructionDataModel(
                 imageUrl = "https://picsum.photos/seed/destruction0/1200/800",
-                status = "active",
                 buildingType = "residential",
                 address = "вул Чорновола, 28",
                 destructionStatistics = DestructionStatisticsDataModel(
@@ -73,16 +34,14 @@ class AppInitializer {
                 destructionDate = "2024-07-08",
                 description = "Будівля зазнала невиправних руйнувань, приблизна кількість жертв становить ...",
                 volunteerNeeds = listOf(
-                    NeedDataModel(name = "Психотерапія", amount = AmountDataModel(3, 10)),
-                    NeedDataModel(name = "Педіатрія", amount = AmountDataModel(1, 2)),
+                    VolunteerNeedDataModel(name = "Психотерапія", amount = AmountDataModel(3, 10)),
+                    VolunteerNeedDataModel(name = "Педіатрія", amount = AmountDataModel(1, 2)),
                 ),
-                resourceNeeds = listOf(
-                    NeedDataModel(name = "Зарядні пристрої", amount = AmountDataModel(8, 8)),
-                ),
+                resourceNeeds = listOf("0", "1"),
+                priority = 5,
             ),
-            DestructionDetailsDataModel(
+            DestructionDataModel(
                 imageUrl = "https://picsum.photos/seed/destruction1/1200/600",
-                status = "completed",
                 buildingType = "medical_institution",
                 address = "вул Лобановського, 28",
                 destructionStatistics = DestructionStatisticsDataModel(
@@ -92,12 +51,11 @@ class AppInitializer {
                 destructionDate = "2022-07-08",
                 description = "Будівля зазнала невиправних руйнувань, приблизна кількість жертв становить ...",
                 volunteerNeeds = listOf(
-                    NeedDataModel(name = "Психотерапія", amount = AmountDataModel(3, 10)),
-                    NeedDataModel(name = "Педіатрія", amount = AmountDataModel(1, 2)),
+                    VolunteerNeedDataModel(name = "Психотерапія", amount = AmountDataModel(3, 10)),
+                    VolunteerNeedDataModel(name = "Педіатрія", amount = AmountDataModel(1, 2)),
                 ),
-                resourceNeeds = listOf(
-                    NeedDataModel(name = "Зарядні пристрої", amount = AmountDataModel(8, 8)),
-                ),
+                resourceNeeds = listOf("2", "3", "4"),
+                priority = 6,
             ),
         )
         database.batch().apply {
@@ -109,52 +67,9 @@ class AppInitializer {
 
     private suspend fun initResources() {
         val database = Firebase.firestore
-        val resourcesCollection = database.collection("resources")
-        val resources = listOf(
-            ResourceDataModel(
-                imageUrl = "https://picsum.photos/seed/resource0/200/300",
-                name = "Бинти",
-                category = "medical_products",
-                amount = AmountDataModel(currentAmount = 100, totalAmount = 100)
-            ),
-            ResourceDataModel(
-                imageUrl = "https://picsum.photos/seed/resource1/200/300",
-                name = "Консерви",
-                category = "food",
-                amount = AmountDataModel(currentAmount = 200, totalAmount = 500)
-            ),
-            ResourceDataModel(
-                imageUrl = "https://picsum.photos/seed/resource2/200/300",
-                name = "Теплі куртки",
-                category = "clothes",
-                amount = AmountDataModel(currentAmount = 75, totalAmount = 150)
-            ),
-            ResourceDataModel(
-                imageUrl = "https://picsum.photos/seed/resource3/200/300",
-                name = "Аптечка",
-                category = "rescue_equipment",
-                amount = AmountDataModel(currentAmount = 30, totalAmount = 50)
-            ),
-            ResourceDataModel(
-                imageUrl = "https://picsum.photos/seed/resource4/200/300",
-                name = "Каністри з паливом",
-                category = "vehicles_and_fuel",
-                amount = AmountDataModel(currentAmount = 75, totalAmount = 200)
-            ),
-        )
-
-        database.batch().apply {
-            resources.forEachIndexed { index, resource ->
-                set(resourcesCollection.document(index.toString()), resource)
-            }
-        }.commit()
-    }
-
-    private suspend fun initResourceDetails() {
-        val database = Firebase.firestore
-        val collection = database.collection("resource_details")
+        val collection = database.collection("resources")
         val resourcesDetails = listOf(
-            ResourceDetailsDataModel(
+            ResourceDataModel(
                 imageUrl = "https://picsum.photos/seed/resource0/800/1000",
                 name = "Бинти",
                 category = "medical_products",
@@ -162,7 +77,7 @@ class AppInitializer {
                 description = "Стерильні бинти для надання першої медичної допомоги.",
                 destructionId = "0"
             ),
-            ResourceDetailsDataModel(
+            ResourceDataModel(
                 imageUrl = "https://picsum.photos/seed/resource1/800/1000",
                 name = "Консерви",
                 category = "food",
@@ -170,7 +85,7 @@ class AppInitializer {
                 description = "Консервовані продукти тривалого зберігання.",
                 destructionId = "0"
             ),
-            ResourceDetailsDataModel(
+            ResourceDataModel(
                 imageUrl = "https://picsum.photos/seed/resource2/800/1000",
                 name = "Теплі куртки",
                 category = "clothes",
@@ -178,7 +93,7 @@ class AppInitializer {
                 description = "Зимові куртки для захисту від холоду.",
                 destructionId = "0"
             ),
-            ResourceDetailsDataModel(
+            ResourceDataModel(
                 imageUrl = "https://picsum.photos/seed/resource3/800/1000",
                 name = "Аптечка",
                 category = "rescue_equipment",
@@ -186,7 +101,7 @@ class AppInitializer {
                 description = "Аптечка для надання невідкладної допомоги.",
                 destructionId = "1"
             ),
-            ResourceDetailsDataModel(
+            ResourceDataModel(
                 imageUrl = "https://picsum.photos/seed/resource4/800/1000",
                 name = "Каністри з паливом",
                 category = "vehicles_and_fuel",

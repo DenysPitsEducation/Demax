@@ -4,12 +4,12 @@ import com.demax.core.data.mapper.ResourceCategoryDomainMapper
 import com.demax.core.data.model.AmountDataModel
 import com.demax.core.data.model.DestructionDataModel
 import com.demax.core.data.model.ResourceDataModel
-import com.demax.core.data.model.ResourceDetailsDataModel
 import com.demax.core.utils.UuidGenerator
 import com.demax.feature.resource.edit.domain.ResourceEditRepository
 import com.demax.feature.resource.edit.domain.model.DestructionDomainModel
 import com.demax.feature.resource.edit.domain.model.ResourceEditDomainModel
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.storage
@@ -48,15 +48,14 @@ class ResourceEditRepositoryImpl(
                 uploadImageToStorage(resource.imageFile, resource.id)
             } else null
             val resourceDataModel = resource.toResourceDataModel(uploadedImageUrl)
-            val resourceDetailsDataModel = resource.toResourceDetailsDataModel(uploadedImageUrl)
-            saveResourceInFirestore(resource.id, resourceDataModel, resourceDetailsDataModel)
+            saveResourceInFirestore(resource.id, resourceDataModel)
         }
     }
 
-    private suspend fun getResourceDataModel(resourceId: String): ResourceDetailsDataModel {
-        val resourceDetailsCollection = Firebase.firestore.collection("resource_details")
-        val resourceDocument = resourceDetailsCollection.document(resourceId).get()
-        return resourceDocument.data(ResourceDetailsDataModel.serializer())
+    private suspend fun getResourceDataModel(resourceId: String): ResourceDataModel {
+        val resourcesCollection = Firebase.firestore.collection("resources")
+        val resourceDocument = resourcesCollection.document(resourceId).get()
+        return resourceDocument.data(ResourceDataModel.serializer())
     }
 
     private fun DestructionDataModel.toDomainModel(id: String): DestructionDomainModel {
@@ -68,18 +67,6 @@ class ResourceEditRepositoryImpl(
 
     private fun ResourceEditDomainModel.toResourceDataModel(uploadedImageUrl: String?): ResourceDataModel {
         return ResourceDataModel(
-            imageUrl = uploadedImageUrl ?: imageUrl,
-            name = name ?: throw ValidationException,
-            category = categoryMapper.mapToDataModel(category ?: throw ValidationException),
-            amount = AmountDataModel(
-                currentAmount = currentAmount ?: throw ValidationException,
-                totalAmount = totalAmount ?: throw ValidationException,
-            ),
-        )
-    }
-
-    private fun ResourceEditDomainModel.toResourceDetailsDataModel(uploadedImageUrl: String?): ResourceDetailsDataModel {
-        return ResourceDetailsDataModel(
             imageUrl = uploadedImageUrl ?: imageUrl,
             name = name ?: throw ValidationException,
             category = categoryMapper.mapToDataModel(category ?: throw ValidationException),
@@ -103,24 +90,15 @@ class ResourceEditRepositoryImpl(
     private suspend fun saveResourceInFirestore(
         resourceId: String,
         resourceDataModel: ResourceDataModel,
-        resourceDetailsDataModel: ResourceDetailsDataModel
     ) {
         val database = Firebase.firestore
         val resourcesCollection = database.collection("resources")
-        val resourceDetailsCollection = database.collection("resource_details")
         val resourceDocument = resourcesCollection.document(resourceId)
-        val resourceDetailsDocument = resourceDetailsCollection.document(resourceId)
         database.batch().apply {
             set(resourceDocument, resourceDataModel)
-            set(resourceDetailsDocument, resourceDetailsDataModel)
         }.commit()
 
-        // TODO Pits: update destructions
-        /*val resourcesOfDestructionDocuments = resourceDetailsCollection.where {
-            any("destructionId" equalTo resourceDetailsDataModel.destructionId)
-        }.get().documents
-        resourcesOfDestructionDocuments.forEach {
-
-        }*/
+        val destructionDocument = Firebase.firestore.collection("destructions").document(resourceDataModel.destructionId)
+        destructionDocument.update("resourceNeeds" to FieldValue.arrayUnion(resourceId))
     }
 }

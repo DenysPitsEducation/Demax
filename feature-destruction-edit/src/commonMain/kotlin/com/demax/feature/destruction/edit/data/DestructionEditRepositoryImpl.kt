@@ -4,9 +4,8 @@ import com.demax.core.data.mapper.BuildingTypeDomainMapper
 import com.demax.core.data.mapper.ResourceCategoryDomainMapper
 import com.demax.core.data.model.AmountDataModel
 import com.demax.core.data.model.DestructionDataModel
-import com.demax.core.data.model.DestructionDetailsDataModel
 import com.demax.core.data.model.DestructionStatisticsDataModel
-import com.demax.core.data.model.NeedDataModel
+import com.demax.core.data.model.VolunteerNeedDataModel
 import com.demax.core.utils.UuidGenerator
 import com.demax.feature.destruction.edit.domain.DestructionEditRepository
 import com.demax.feature.destruction.edit.domain.model.DestructionEditDomainModel
@@ -71,12 +70,9 @@ class DestructionEditRepositoryImpl(
                 uploadImageToStorage(destruction.imageFile, destruction.id)
             } else null
             val destructionDataModel = destruction.toDestructionDataModel(uploadedImageUrl)
-            val destructionDetailsDataModel =
-                destruction.toDestructionDetailsDataModel(uploadedImageUrl)
             saveDestructionInFirestore(
                 destruction.id,
                 destructionDataModel,
-                destructionDetailsDataModel
             )
         }
     }
@@ -85,26 +81,6 @@ class DestructionEditRepositoryImpl(
         val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
         return DestructionDataModel(
             imageUrl = uploadedImageUrl ?: imageUrl,
-            buildingType = buildingTypeMapper.mapToDataModel(
-                buildingType ?: throw ValidationException
-            ),
-            address = address ?: throw ValidationException,
-            destructionDate = formatter.format(destructionDate ?: throw ValidationException),
-            resourceProgress = 0.0,
-            volunteerProgress = 0.0,
-            specializations = needsDomainModel.specializations
-                .filter { it.quantity > 0 }
-                .map { it.name },
-            status = "active",
-            priority = 10 // TODO Pits: should be some logic here
-        )
-    }
-
-    private fun DestructionEditDomainModel.toDestructionDetailsDataModel(uploadedImageUrl: String?): DestructionDetailsDataModel {
-        val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
-        return DestructionDetailsDataModel(
-            imageUrl = uploadedImageUrl ?: imageUrl,
-            status = "active",
             buildingType = buildingTypeMapper.mapToDataModel(
                 buildingType ?: throw ValidationException
             ),
@@ -118,7 +94,7 @@ class DestructionEditRepositoryImpl(
             volunteerNeeds = needsDomainModel.specializations
                 .filter { it.quantity > 0 }
                 .map { specialization ->
-                    NeedDataModel(
+                    VolunteerNeedDataModel(
                         name = specialization.name,
                         amount = AmountDataModel(
                             currentAmount = 0,
@@ -127,6 +103,7 @@ class DestructionEditRepositoryImpl(
                     )
                 },
             resourceNeeds = listOf(),
+            priority = 10,
         )
     }
 
@@ -141,16 +118,10 @@ class DestructionEditRepositoryImpl(
     private suspend fun saveDestructionInFirestore(
         destructionId: String,
         destructionDataModel: DestructionDataModel,
-        destructionDetailsDataModel: DestructionDetailsDataModel,
     ) {
         val database = Firebase.firestore
         val destructionsCollection = database.collection("destructions")
-        val destructionDetailsCollection = database.collection("destruction_details")
         val destructionDocument = destructionsCollection.document(destructionId)
-        val destructionDetailsDocument = destructionDetailsCollection.document(destructionId)
-        database.batch().apply {
-            set(destructionDocument, destructionDataModel)
-            set(destructionDetailsDocument, destructionDetailsDataModel)
-        }.commit()
+        destructionDocument.set(destructionDataModel)
     }
 }

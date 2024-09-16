@@ -39,7 +39,7 @@ internal class DestructionsViewModel(
                         filters = getFilters(destructions)
                     )
                 }
-            }
+            }.onFailure { it.printStackTrace() }
         }
     }
 
