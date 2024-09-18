@@ -1,5 +1,9 @@
 package com.demax.feature.responses.navigation
 
-interface ResponsesRouter {
+import androidx.navigation.NavController
 
+interface ResponsesRouter {
+    fun openProfile(navController: NavController, id: String)
+    fun openDestructionDetails(navController: NavController, id: String)
+    fun openResourceDetails(navController: NavController, id: String)
 }

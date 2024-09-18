@@ -94,11 +94,10 @@ class ResourceEditRepositoryImpl(
         val database = Firebase.firestore
         val resourcesCollection = database.collection("resources")
         val resourceDocument = resourcesCollection.document(resourceId)
+        val destructionDocument = database.collection("destructions").document(resourceDataModel.destructionId)
         database.batch().apply {
             set(resourceDocument, resourceDataModel)
+            update(destructionDocument, "resourceNeeds" to FieldValue.arrayUnion(resourceId))
         }.commit()
-
-        val destructionDocument = Firebase.firestore.collection("destructions").document(resourceDataModel.destructionId)
-        destructionDocument.update("resourceNeeds" to FieldValue.arrayUnion(resourceId))
     }
 }

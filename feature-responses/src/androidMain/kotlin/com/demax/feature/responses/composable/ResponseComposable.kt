@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -32,10 +35,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.demax.core.R
 import com.demax.core.ui.PreviewContainer
 import com.demax.feature.responses.model.ResponseTypeUiModel
 import com.demax.feature.responses.model.ResponseUiModel
 import com.demax.feature.responses.mvi.ResponsesIntent
+import com.google.api.ResourceProto.resource
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -48,9 +53,6 @@ fun ResourceComposable(
         modifier = modifier
             .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
             .clip(RoundedCornerShape(8.dp))
-            .clickable {
-                onUserInteraction(ResponsesIntent.DestructionClicked(model.id))
-            }
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
     ) {
@@ -59,6 +61,9 @@ fun ResourceComposable(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
+                .clickable {
+                    onUserInteraction(ResponsesIntent.ProfileClicked(model.profile.id))
+                }
                 .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(vertical = 8.dp, horizontal = 12.dp),
@@ -71,6 +76,7 @@ fun ResourceComposable(
                     .clip(CircleShape)
                     .size(50.dp),
                 contentScale = ContentScale.Crop,
+                error = painterResource(R.drawable.ill_no_photo),
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
@@ -86,6 +92,9 @@ fun ResourceComposable(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        onUserInteraction(ResponsesIntent.DestructionClicked(destruction.id))
+                    }
                     .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(vertical = 8.dp, horizontal = 12.dp),
@@ -98,6 +107,7 @@ fun ResourceComposable(
                         .clip(CircleShape)
                         .size(50.dp),
                     contentScale = ContentScale.Crop,
+                    error = painterResource(R.drawable.ill_no_photo),
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
@@ -122,54 +132,60 @@ fun ResourceComposable(
             }
         }
         if (model.type is ResponseTypeUiModel.Resource) {
-            val resource = model.type.resource
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                    .padding(vertical = 8.dp, horizontal = 12.dp),
-            ) {
-                AsyncImage(
-                    model = resource.imageUrl,
-                    contentDescription = null,
+            val resources = model.type.resources
+            resources.forEach { resource ->
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .border(1.dp, Color(0xFFA8A8A9), CircleShape)
-                        .clip(CircleShape)
-                        .size(50.dp),
-                    contentScale = ContentScale.Crop,
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Категорія: ")
-                            }
-                            append(resource.category)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            onUserInteraction(ResponsesIntent.ResourceClicked(resource.id))
                         }
+                        .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .padding(vertical = 8.dp, horizontal = 12.dp),
+                ) {
+                    AsyncImage(
+                        model = resource.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .border(1.dp, Color(0xFFA8A8A9), CircleShape)
+                            .clip(CircleShape)
+                            .size(50.dp),
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(R.drawable.ill_no_photo),
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Назва: ")
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append("Категорія: ")
+                                }
+                                append(resource.category)
                             }
-                            append(resource.name)
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("Кількість: ")
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append("Назва: ")
+                                }
+                                append(resource.name)
                             }
-                            append(resource.quantity.toString())
-                        }
-                    )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                    append("Кількість: ")
+                                }
+                                append(resource.quantity.toString())
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -203,6 +219,28 @@ fun ResourceComposable(
             )
             Spacer(modifier = Modifier.width(8.dp))
             LabelComposable(model.status.text, model.status.background)
+        }
+        if (model.showConfirmationButtons) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Row {
+                Button(
+                    onClick = {
+                        onUserInteraction(ResponsesIntent.ApproveButtonClicked(model.id))
+                    },
+                    modifier = Modifier.weight(0.5f)
+                ) {
+                    Text("Прийняти")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        onUserInteraction(ResponsesIntent.RejectButtonClicked(model.id))
+                    },
+                    modifier = Modifier.weight(0.5f)
+                ) {
+                    Text("Відхилити")
+                }
+            }
         }
     }
 }

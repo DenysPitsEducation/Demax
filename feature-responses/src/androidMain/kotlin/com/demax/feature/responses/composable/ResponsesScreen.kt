@@ -42,6 +42,7 @@ import com.demax.feature.responses.model.ResponseUiModel
 import com.demax.feature.responses.model.ResponsesUiModel
 import com.demax.feature.responses.model.StatusUiModel
 import com.demax.feature.responses.mvi.ResponsesIntent
+import com.demax.feature.responses.mvi.ResponsesSideEffect
 import com.demax.feature.responses.navigation.ResponsesRouter
 import org.koin.compose.koinInject
 
@@ -59,12 +60,12 @@ fun ResponsesScreen(navController: NavHostController) {
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
-        /*when (sideEffect) {
-            is ResourcesSideEffect.OpenMainScreen -> router.openMainScreen(navController)
-            is ResourcesSideEffect.OpenPasswordResetScreen -> router.openPasswordResetScreen(navController)
-            is ResourcesSideEffect.OpenRegistrationScreen -> router.openRegistrationScreen(navController)
-            is ResourcesSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
-        }*/
+        when (sideEffect) {
+            is ResponsesSideEffect.OpenProfile -> router.openProfile(navController, sideEffect.id)
+            is ResponsesSideEffect.OpenDestructionDetails -> router.openDestructionDetails(navController, sideEffect.id)
+            is ResponsesSideEffect.OpenResourceDetails -> router.openResourceDetails(navController, sideEffect.id)
+            is ResponsesSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
+        }
     }
 
     ResponsesContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
@@ -140,14 +141,15 @@ private fun ResponsesContent(
 
 fun createResponseUiModelsMock() = listOf(
     ResponseUiModel(
-        id = 0,
+        id = "0",
         profile = ProfileUiModel(
-            id = 0,
+            id = "0",
             name = "Ксюша",
             imageUrl = null,
         ),
         type = ResponseTypeUiModel.Volunteer(
             destruction = DestructionUiModel(
+                id = "0",
                 imageUrl = null,
                 destructionDate = "13/06/2024",
                 address = "вул Чорновола, 28"
@@ -161,19 +163,21 @@ fun createResponseUiModelsMock() = listOf(
         showConfirmationButtons = true,
     ),
     ResponseUiModel(
-        id = 1,
+        id = "1",
         profile = ProfileUiModel(
-            id = 1,
+            id = "1",
             name = "Маша",
             imageUrl = null,
         ),
         type = ResponseTypeUiModel.Resource(
-            resource = ResourceUiModel(
-                id = 0,
-                imageUrl = null,
-                category = "Медичні засоби",
-                name = "Антисептичні серветки",
-                quantity = 5,
+            resources = listOf(
+                ResourceUiModel(
+                    id = "0",
+                    imageUrl = null,
+                    category = "Медичні засоби",
+                    name = "Антисептичні серветки",
+                    quantity = 5,
+                )
             ),
         ),
         status = StatusUiModel(

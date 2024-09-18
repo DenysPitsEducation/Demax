@@ -7,6 +7,6 @@ sealed class ResponseTypeDomainModel {
     ) : ResponseTypeDomainModel()
 
     data class Resource(
-        val resource: ResourceDomainModel,
+        val resources: List<ResourceDomainModel>,
     ) : ResponseTypeDomainModel()
 }

@@ -7,6 +7,6 @@ sealed class ResponseTypeUiModel {
     ) : ResponseTypeUiModel()
 
     data class Resource(
-        val resource: ResourceUiModel,
+        val resources: List<ResourceUiModel>,
     ) : ResponseTypeUiModel()
 }

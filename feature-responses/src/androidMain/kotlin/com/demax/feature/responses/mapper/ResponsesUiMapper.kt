@@ -1,6 +1,7 @@
 package com.demax.feature.responses.mapper
 
 import androidx.compose.ui.graphics.Color
+import com.demax.core.ui.mapper.ResourceCategoryUiMapper
 import com.demax.feature.responses.domain.model.ProfileDomainModel
 import com.demax.feature.responses.domain.model.ResponseDomainModel
 import com.demax.feature.responses.domain.model.ResponseTypeDomainModel
@@ -12,11 +13,16 @@ import com.demax.feature.responses.model.ResponseUiModel
 import com.demax.feature.responses.model.ResponsesUiModel
 import com.demax.feature.responses.model.StatusUiModel
 import com.demax.feature.responses.mvi.ResponsesState
+import com.google.api.ResourceProto.resource
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-internal class ResponsesUiMapper {
+internal class ResponsesUiMapper(
+    val resourceCategoryMapper: ResourceCategoryUiMapper,
+) {
 
     fun mapToUiModel(state: ResponsesState): ResponsesUiModel = state.run {
         return ResponsesUiModel(
@@ -42,22 +48,25 @@ internal class ResponsesUiMapper {
         return when (this) {
             is ResponseTypeDomainModel.Resource -> {
                 ResponseTypeUiModel.Resource(
-                    resource = ResourceUiModel(
-                        id = resource.id,
-                        imageUrl = resource.imageUrl,
-                        category = resource.category,
-                        name = resource.name,
-                        quantity = resource.quantity,
-                    )
+                    resources = resources.map { resource ->
+                        ResourceUiModel(
+                            id = resource.id,
+                            imageUrl = resource.imageUrl,
+                            category = resourceCategoryMapper.mapToUiModel(resource.category),
+                            name = resource.name,
+                            quantity = resource.quantity,
+                        )
+                    }
                 )
             }
 
             is ResponseTypeDomainModel.Volunteer -> {
-                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+                val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
                 ResponseTypeUiModel.Volunteer(
                     destruction = DestructionUiModel(
+                        id = destruction.id,
                         imageUrl = destruction.imageUrl,
-                        destructionDate = formatter.format(destruction.destructionDate.toJavaLocalDate()),
+                        destructionDate = formatter.format(destruction.destructionDate),
                         address = destruction.address,
                     ),
                     specializations = specializations,

@@ -95,6 +95,17 @@ fun appModule() = module {
     }
     factory<ResponsesRouter> {
         object : ResponsesRouter {
+            override fun openProfile(navController: NavController, id: String) {
+                // TODO Pits:  
+            }
+
+            override fun openDestructionDetails(navController: NavController, id: String) {
+                navController.navigate(DestructionDetailsPayload(id))
+            }
+
+            override fun openResourceDetails(navController: NavController, id: String) {
+                navController.navigate(ResourceDetailsPayload(id))
+            }
         }
     }
 }

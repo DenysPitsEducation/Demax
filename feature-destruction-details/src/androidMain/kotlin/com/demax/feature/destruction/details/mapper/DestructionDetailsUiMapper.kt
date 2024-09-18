@@ -69,8 +69,9 @@ internal class DestructionDetailsUiMapper(
             dateInputText = selectedDate?.let { formatter.format(it) },
             needs = needs.map { need ->
                 ResourceNeedBottomSheetUiModel(
+                    id = need.id,
                     title = need.title,
-                    quantity = need.quantity?.toString(),
+                    quantity = need.quantityText,
                     isSelected = need.isSelected,
                 )
             },

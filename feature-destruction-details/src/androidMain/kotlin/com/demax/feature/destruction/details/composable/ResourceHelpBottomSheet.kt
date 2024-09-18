@@ -199,7 +199,7 @@ internal fun ResourceHelpBottomSheetContent(
                     onValueChange = {
                         onUserInteraction(
                             ResourceHelpBottomSheetIntent.ResourceQuantityChanged(
-                                resource = need.title,
+                                id = need.id,
                                 quantity = it
                             )
                         )
@@ -236,11 +236,13 @@ private fun ResourceHelpBottomSheetContentPreview() {
                 dateInputText = null,
                 needs = listOf(
                     ResourceNeedBottomSheetUiModel(
+                        id = "0",
                         title = "Аптечка",
                         quantity = null,
                         isSelected = true
                     ),
                     ResourceNeedBottomSheetUiModel(
+                        id = "1",
                         title = "Машина",
                         quantity = "1",
                         isSelected = false

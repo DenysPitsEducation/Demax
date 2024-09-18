@@ -1,7 +1,8 @@
 package com.demax.feature.destruction.details.domain.model
 
 data class ResourceNeedBottomSheetDomainModel(
+    val id: String,
     val title: String,
-    val quantity: Int?,
+    val quantityText: String,
     val isSelected: Boolean,
 )

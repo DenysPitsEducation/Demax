@@ -15,6 +15,7 @@ import com.demax.feature.destruction.details.mvi.DestructionDetailsState
 import com.demax.feature.destruction.details.mvi.ResourceHelpBottomSheetIntent
 import com.demax.feature.destruction.details.mvi.VolunteerHelpBottomSheetIntent
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -60,8 +61,9 @@ class DestructionDetailsViewModel(
                                     .filter { it.amount.totalAmount != it.amount.currentAmount }
                                     .map { need ->
                                         ResourceNeedBottomSheetDomainModel(
+                                            id = need.id,
                                             title = need.name,
-                                            quantity = 1,
+                                            quantityText = "1",
                                             isSelected = false,
                                         )
                                     },
@@ -121,8 +123,13 @@ class DestructionDetailsViewModel(
         viewModelScope.emitSideEffect(DestructionDetailsSideEffect.OpenVolunteerHelpDatePicker)
     }
 
-    private fun onVolunteerHelpProvideHelpButtonClicked() {
-        viewModelScope.emitSideEffect(DestructionDetailsSideEffect.ShowSnackbar("Запит на допомогу успішно відправлено"))
+    private fun onVolunteerHelpProvideHelpButtonClicked() = viewModelScope.launch(Dispatchers.IO) {
+        repository.sendVolunteerResponse(payload.id, getState().volunteerHelpBottomSheet!!).onSuccess {
+            viewModelScope.emitSideEffect(DestructionDetailsSideEffect.ShowSnackbar("Запит на допомогу успішно відправлено"))
+        }.onFailure {
+            it.printStackTrace()
+            viewModelScope.emitSideEffect(DestructionDetailsSideEffect.ShowSnackbar("Помилка відправлення запиту про допомогу"))
+        }
     }
 
     private fun onVolunteerHelpSpecializationOptionClicked(intent: VolunteerHelpBottomSheetIntent.SpecializationOptionClicked) {
@@ -152,8 +159,13 @@ class DestructionDetailsViewModel(
         viewModelScope.emitSideEffect(DestructionDetailsSideEffect.OpenResourceHelpDatePicker)
     }
 
-    private fun onResourceHelpProvideHelpButtonClicked() {
-        viewModelScope.emitSideEffect(DestructionDetailsSideEffect.ShowSnackbar("Запит на допомогу успішно відправлено"))
+    private fun onResourceHelpProvideHelpButtonClicked() = viewModelScope.launch(Dispatchers.IO) {
+        repository.sendResourceResponse(payload.id, getState().resourceHelpBottomSheet!!).onSuccess {
+            viewModelScope.emitSideEffect(DestructionDetailsSideEffect.ShowSnackbar("Запит на допомогу успішно відправлено"))
+        }.onFailure {
+            it.printStackTrace()
+            viewModelScope.emitSideEffect(DestructionDetailsSideEffect.ShowSnackbar("Помилка відправлення запиту про допомогу"))
+        }
     }
 
     private fun onResourceHelpResourceOptionClicked(intent: ResourceHelpBottomSheetIntent.ResourceOptionClicked) {
@@ -173,8 +185,8 @@ class DestructionDetailsViewModel(
     private fun onResourceHelpResourceQuantityChanged(intent: ResourceHelpBottomSheetIntent.ResourceQuantityChanged) {
         val resourceHelpBottomSheet = getState().resourceHelpBottomSheet ?: return
         val updatedNeeds = resourceHelpBottomSheet.needs.map { need ->
-            if (need.title == intent.resource) {
-                need.copy(quantity = intent.quantity.toIntOrNull())
+            if (need.id == intent.id) {
+                need.copy(quantityText = intent.quantity)
             } else {
                 need
             }
