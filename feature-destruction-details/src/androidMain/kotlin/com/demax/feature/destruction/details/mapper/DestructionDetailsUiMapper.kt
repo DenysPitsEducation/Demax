@@ -7,18 +7,15 @@ import com.demax.feature.destruction.details.domain.model.AmountDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionDetailsDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionStatisticsDomainModel
 import com.demax.feature.destruction.details.domain.model.NeedDomainModel
-import com.demax.feature.destruction.details.domain.model.ResourceHelpBottomSheetDomainModel
 import com.demax.feature.destruction.details.domain.model.VolunteerHelpBottomSheetDomainModel
 import com.demax.feature.destruction.details.model.DestructionDetailsUiModel
 import com.demax.feature.destruction.details.model.DestructionStatisticsUiModel
 import com.demax.feature.destruction.details.model.NeedUiModel
 import com.demax.feature.destruction.details.model.ProgressUiModel
-import com.demax.feature.destruction.details.model.ResourceHelpBottomSheetUiModel
-import com.demax.feature.destruction.details.model.ResourceNeedBottomSheetUiModel
 import com.demax.feature.destruction.details.model.ResourceNeedsBlockUiModel
+import com.demax.feature.destruction.details.model.VolunteerHelpBottomSheetUiModel
 import com.demax.feature.destruction.details.model.VolunteerNeedBottomSheetUiModel
 import com.demax.feature.destruction.details.model.VolunteerNeedsBlockUiModel
-import com.demax.feature.destruction.details.model.VolunteerHelpBottomSheetUiModel
 import com.demax.feature.destruction.details.mvi.DestructionDetailsState
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format.byUnicodePattern
@@ -56,22 +53,6 @@ internal class DestructionDetailsUiMapper(
             needs = needs.map { need ->
                 VolunteerNeedBottomSheetUiModel(
                     title = need.title,
-                    isSelected = need.isSelected,
-                )
-            },
-            isButtonEnabled = selectedDate != null && needs.any { it.isSelected },
-        )
-    }
-
-    fun mapToResourceBottomSheetUiModel(model: ResourceHelpBottomSheetDomainModel): ResourceHelpBottomSheetUiModel = model.run {
-        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
-        return ResourceHelpBottomSheetUiModel(
-            dateInputText = selectedDate?.let { formatter.format(it) },
-            needs = needs.map { need ->
-                ResourceNeedBottomSheetUiModel(
-                    id = need.id,
-                    title = need.title,
-                    quantity = need.quantityText,
                     isSelected = need.isSelected,
                 )
             },

@@ -1,4 +1,4 @@
-package com.demax.feature.destruction.details.model
+package com.demax.feature.resource.help.model
 
 data class ResourceNeedBottomSheetUiModel(
     val id: String,

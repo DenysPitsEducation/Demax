@@ -19,10 +19,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.demax.core.mvi.SideEffectLaunchedEffect
+import com.demax.core.navigation.ResourceHelpPayload
 import com.demax.core.ui.LocalSnackbarHostState
 import com.demax.core.ui.PreviewContainer
 import com.demax.feature.resource.details.ResourceDetailsViewModel
@@ -48,11 +56,13 @@ import com.demax.feature.resource.details.mvi.ResourceDetailsIntent
 import com.demax.feature.resource.details.mvi.ResourceDetailsSideEffect
 import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
 import com.demax.feature.resource.details.navigation.ResourceDetailsRouter
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 internal typealias OnUserInteraction = (ResourceDetailsIntent) -> Unit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResourceDetailsScreen(
     navController: NavHostController,
@@ -64,13 +74,26 @@ fun ResourceDetailsScreen(
     val state = viewModel.uiState.collectAsState().value
     val uiModel = mapper.mapToUiModel(state)
     val snackbarHostState = LocalSnackbarHostState.current
+    val scope = rememberCoroutineScope()
+
+    val resourceHelpBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showResourceHelpBottomSheet by remember { mutableStateOf(false) }
+    val dismissResourceHelpBottomSheet: () -> Unit = {
+        scope.launch {
+            resourceHelpBottomSheetState.hide()
+            showResourceHelpBottomSheet = false
+        }
+    }
 
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
         when (sideEffect) {
             is ResourceDetailsSideEffect.OpenResourceEditScreen -> router.openResourceEditScreen(navController, payload.id)
-            is ResourceDetailsSideEffect.OpenResourceHelpBottomSheet -> { /* todo */ }
+            is ResourceDetailsSideEffect.OpenResourceHelpBottomSheet -> {
+                showResourceHelpBottomSheet = true
+                resourceHelpBottomSheetState.show()
+            }
             is ResourceDetailsSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }
@@ -84,6 +107,21 @@ fun ResourceDetailsScreen(
         ) {
             CircularProgressIndicator()
         }
+    }
+
+    if (showResourceHelpBottomSheet && state.resourceDetails != null) {
+        router.ResourceHelpBottomSheet(
+            payload = ResourceHelpPayload(
+                resources = listOf(
+                    ResourceHelpPayload.Resource(
+                        id = state.resourceDetails.id,
+                        name = state.resourceDetails.name,
+                    )
+                )
+            ),
+            dismissAction = dismissResourceHelpBottomSheet,
+            bottomSheetState = resourceHelpBottomSheetState,
+        )
     }
 }
 

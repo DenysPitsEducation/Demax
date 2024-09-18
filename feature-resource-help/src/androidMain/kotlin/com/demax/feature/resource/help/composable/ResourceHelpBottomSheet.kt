@@ -1,9 +1,8 @@
-package com.demax.feature.destruction.details.composable
+package com.demax.feature.resource.help.composable
 
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -25,80 +22,108 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.demax.core.mvi.SideEffectLaunchedEffect
+import com.demax.feature.resource.help.mvi.ResourceHelpIntent
 import com.demax.core.ui.PreviewContainer
-import com.demax.feature.destruction.details.model.ResourceHelpBottomSheetUiModel
-import com.demax.feature.destruction.details.model.ResourceNeedBottomSheetUiModel
-import com.demax.feature.destruction.details.model.VolunteerNeedBottomSheetUiModel
-import com.demax.feature.destruction.details.model.VolunteerHelpBottomSheetUiModel
-import com.demax.feature.destruction.details.mvi.ResourceHelpBottomSheetIntent
-import com.demax.feature.destruction.details.mvi.VolunteerHelpBottomSheetIntent
+import com.demax.feature.resource.help.ResourceHelpViewModel
+import com.demax.feature.resource.help.mapper.ResourceHelpUiMapper
+import com.demax.feature.resource.help.model.ResourceHelpBottomSheetUiModel
+import com.demax.feature.resource.help.model.ResourceNeedBottomSheetUiModel
+import com.demax.feature.resource.help.mvi.ResourceHelpSideEffect
+import com.demax.core.navigation.ResourceHelpPayload
+import com.demax.core.ui.LocalSnackbarHostState
+import com.demax.feature.resource.help.mvi.ResourceHelpState
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
+
+internal typealias OnUserInteraction = (ResourceHelpIntent) -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ResourceHelpBottomSheet(
+fun ResourceHelpBottomSheet(
+    payload: ResourceHelpPayload,
     dismissAction: () -> Unit,
     bottomSheetState: SheetState,
-    uiModel: ResourceHelpBottomSheetUiModel,
-    onUserInteraction: OnUserInteraction,
-    showDatePickerDialog: MutableState<Boolean>,
 ) {
+    var showDatePickerDialog by remember { mutableStateOf(false) }
+    val viewModel: ResourceHelpViewModel = koinInject(parameters = { parametersOf(payload) })
+    val onUserInteraction: OnUserInteraction = viewModel::onIntent
     val datePickerState = rememberDatePickerState()
+    val mapper: ResourceHelpUiMapper = koinInject()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiModel = mapper.mapToUiModel(state.resourceHelpBottomSheet)
+    val context = LocalContext.current
+
+    SideEffectLaunchedEffect(
+        sideEffectsFlow = viewModel.sideEffects,
+    ) { sideEffect ->
+        when (sideEffect) {
+            is ResourceHelpSideEffect.OpenResourceHelpDatePicker -> {
+                showDatePickerDialog = true
+            }
+            is ResourceHelpSideEffect.ShowMessage -> {
+                Toast.makeText(context, sideEffect.text, Toast.LENGTH_LONG).show()
+            }
+            is ResourceHelpSideEffect.DismissBottomSheet -> {
+                dismissAction()
+            }
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = dismissAction,
         sheetState = bottomSheetState,
     ) {
         ResourceHelpBottomSheetContent(
-            dismissAction = dismissAction,
             uiModel = uiModel,
             onUserInteraction = onUserInteraction
         )
     }
 
     LaunchedEffect(datePickerState.selectedDateMillis) {
-        onUserInteraction(ResourceHelpBottomSheetIntent.DateChanged(datePickerState.selectedDateMillis))
+        onUserInteraction(ResourceHelpIntent.DateChanged(datePickerState.selectedDateMillis))
     }
 
-    if (showDatePickerDialog.value) {
+    if (showDatePickerDialog) {
         DatePickerDialog(
             onDismissRequest = {
-                showDatePickerDialog.value = false
+                showDatePickerDialog = false
             },
             confirmButton = {
                 TextButton(
-                    onClick = { showDatePickerDialog.value = false },
+                    onClick = { showDatePickerDialog = false },
                 ) {
                     Text("OK")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showDatePickerDialog.value = false },
+                    onClick = { showDatePickerDialog = false },
                 ) {
                     Text("Cancel")
                 }
@@ -109,10 +134,8 @@ internal fun ResourceHelpBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ResourceHelpBottomSheetContent(
-    dismissAction: () -> Unit,
     uiModel: ResourceHelpBottomSheetUiModel,
     onUserInteraction: OnUserInteraction,
 ) {
@@ -150,7 +173,7 @@ internal fun ResourceHelpBottomSheetContent(
             Box(modifier = Modifier
                 .matchParentSize()
                 .clickable {
-                    onUserInteraction(ResourceHelpBottomSheetIntent.DateInputClicked)
+                    onUserInteraction(ResourceHelpIntent.DateInputClicked)
                 })
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -165,7 +188,7 @@ internal fun ResourceHelpBottomSheetContent(
                     .fillMaxWidth()
                     .clickable {
                         onUserInteraction(
-                            ResourceHelpBottomSheetIntent.ResourceOptionClicked(need.title)
+                            ResourceHelpIntent.ResourceOptionClicked(need.title)
                         )
                     }
             ) {
@@ -174,7 +197,7 @@ internal fun ResourceHelpBottomSheetContent(
                     modifier = Modifier.size(40.dp),
                     onCheckedChange = {
                         onUserInteraction(
-                            ResourceHelpBottomSheetIntent.ResourceOptionClicked(need.title)
+                            ResourceHelpIntent.ResourceOptionClicked(need.title)
                         )
                     },
                 )
@@ -198,7 +221,7 @@ internal fun ResourceHelpBottomSheetContent(
                     },
                     onValueChange = {
                         onUserInteraction(
-                            ResourceHelpBottomSheetIntent.ResourceQuantityChanged(
+                            ResourceHelpIntent.ResourceQuantityChanged(
                                 id = need.id,
                                 quantity = it
                             )
@@ -216,8 +239,7 @@ internal fun ResourceHelpBottomSheetContent(
             enabled = uiModel.isButtonEnabled,
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                dismissAction()
-                onUserInteraction(ResourceHelpBottomSheetIntent.ProvideHelpButtonClicked)
+                onUserInteraction(ResourceHelpIntent.ProvideHelpButtonClicked)
             }
         ) {
             Text("Надати допомогу")
@@ -231,7 +253,6 @@ internal fun ResourceHelpBottomSheetContent(
 private fun ResourceHelpBottomSheetContentPreview() {
     PreviewContainer {
         ResourceHelpBottomSheetContent(
-            dismissAction = {},
             uiModel = ResourceHelpBottomSheetUiModel(
                 dateInputText = null,
                 needs = listOf(

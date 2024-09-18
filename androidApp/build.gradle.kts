@@ -60,6 +60,7 @@ dependencies {
     implementation(projects.featureProfile)
     implementation(projects.featureResourceDetails)
     implementation(projects.featureResourceEdit)
+    implementation(projects.featureResourceHelp)
     implementation(projects.featureResources)
     implementation(projects.featureResponses)
 }

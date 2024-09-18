@@ -21,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -42,10 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.demax.core.mvi.SideEffectLaunchedEffect
+import com.demax.core.navigation.ResourceHelpPayload
 import com.demax.core.ui.LocalSnackbarHostState
 import com.demax.core.ui.PreviewContainer
-import com.demax.feature.destruction.details.mvi.DestructionDetailsIntent
-import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
 import com.demax.feature.destruction.details.DestructionDetailsViewModel
 import com.demax.feature.destruction.details.mapper.DestructionDetailsUiMapper
 import com.demax.feature.destruction.details.model.DestructionDetailsUiModel
@@ -54,8 +52,10 @@ import com.demax.feature.destruction.details.model.NeedUiModel
 import com.demax.feature.destruction.details.model.ProgressUiModel
 import com.demax.feature.destruction.details.model.ResourceNeedsBlockUiModel
 import com.demax.feature.destruction.details.model.VolunteerNeedsBlockUiModel
+import com.demax.feature.destruction.details.mvi.DestructionDetailsIntent
 import com.demax.feature.destruction.details.mvi.DestructionDetailsSideEffect
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
+import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -87,9 +87,6 @@ fun DestructionDetailsScreen(navController: NavHostController, payload: Destruct
     }
     val showVolunteerDatePickerDialog = remember { mutableStateOf(false) }
 
-    val resourceBottomSheetModel = state.resourceHelpBottomSheet?.let {
-        mapper.mapToResourceBottomSheetUiModel(it)
-    }
     val resourceHelpBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showResourceHelpBottomSheet by remember { mutableStateOf(false) }
     val dismissResourceHelpBottomSheet: () -> Unit = {
@@ -98,7 +95,6 @@ fun DestructionDetailsScreen(navController: NavHostController, payload: Destruct
             showResourceHelpBottomSheet = false
         }
     }
-    val showResourceDatePickerDialog = remember { mutableStateOf(false) }
 
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
@@ -108,19 +104,20 @@ fun DestructionDetailsScreen(navController: NavHostController, payload: Destruct
                 showVolunteerHelpBottomSheet = true
                 volunteerHelpBottomSheetState.show()
             }
+
             is DestructionDetailsSideEffect.OpenVolunteerHelpDatePicker -> {
                 showVolunteerDatePickerDialog.value = true
             }
+
             is DestructionDetailsSideEffect.ShowSnackbar -> scope.launch {
                 snackbarHostState.showSnackbar(sideEffect.text)
             }
+
             is DestructionDetailsSideEffect.OpenResourceHelpBottomSheet -> {
                 showResourceHelpBottomSheet = true
                 resourceHelpBottomSheetState.show()
             }
-            is DestructionDetailsSideEffect.OpenResourceHelpDatePicker -> {
-                showResourceDatePickerDialog.value = true
-            }
+
             is DestructionDetailsSideEffect.OpenResourceEditScreen -> {
                 router.openResourceEditScreen(navController)
             }
@@ -148,17 +145,18 @@ fun DestructionDetailsScreen(navController: NavHostController, payload: Destruct
         )
     }
 
-    if (showResourceHelpBottomSheet && resourceBottomSheetModel != null) {
-        ResourceHelpBottomSheet(
+    if (showResourceHelpBottomSheet) {
+        router.ResourceHelpBottomSheet(
+            payload = ResourceHelpPayload(
+                resources = state.destructionDetails!!.resourceNeeds
+                    .filter { it.amount.currentAmount < it.amount.totalAmount }
+                    .map { ResourceHelpPayload.Resource(it.id, it.name) }
+            ),
             dismissAction = dismissResourceHelpBottomSheet,
             bottomSheetState = resourceHelpBottomSheetState,
-            uiModel = resourceBottomSheetModel,
-            onUserInteraction = onUserInteraction,
-            showDatePickerDialog = showResourceDatePickerDialog
         )
     }
 }
-
 
 
 @Composable
@@ -300,7 +298,10 @@ private fun VolunteerNeedsBlockComposable(
 }
 
 @Composable
-private fun ResourceNeedsBlockComposable(model: ResourceNeedsBlockUiModel, onUserInteraction: OnUserInteraction) {
+private fun ResourceNeedsBlockComposable(
+    model: ResourceNeedsBlockUiModel,
+    onUserInteraction: OnUserInteraction
+) {
     Column {
         Text(
             text = "Потреби у ресурсах (запити):",

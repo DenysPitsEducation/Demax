@@ -1,4 +1,4 @@
-package com.demax.feature.destruction.details.domain.model
+package com.demax.feature.resource.help.domain.model
 
 import kotlinx.datetime.LocalDate
 

@@ -1,9 +1,13 @@
 package com.demax.android.di
 
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.demax.android.AppInitializer
 import com.demax.android.MainPayload
+import com.demax.core.navigation.ResourceHelpPayload
 import com.demax.feature.authorization.common.AuthorizationRouter
 import com.demax.feature.authorization.login.LoginPayload
 import com.demax.feature.authorization.passwordReset.PasswordResetPayload
@@ -23,6 +27,7 @@ import com.demax.feature.responses.navigation.ResponsesRouter
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
+@OptIn(ExperimentalMaterial3Api::class)
 fun appModule() = module {
     factoryOf(::AppInitializer)
 
@@ -50,6 +55,19 @@ fun appModule() = module {
             override fun openResourceEditScreen(navController: NavHostController) {
                 navController.navigate(ResourceEditPayload(resourceId = null))
             }
+
+            @Composable
+            override fun ResourceHelpBottomSheet(
+                payload: ResourceHelpPayload,
+                dismissAction: () -> Unit,
+                bottomSheetState: SheetState,
+            ) {
+                com.demax.feature.resource.help.composable.ResourceHelpBottomSheet(
+                    payload = payload,
+                    dismissAction = dismissAction,
+                    bottomSheetState = bottomSheetState,
+                )
+            }
         }
     }
     factory<DestructionEditRouter> {
@@ -75,6 +93,19 @@ fun appModule() = module {
         object : ResourceDetailsRouter {
             override fun openResourceEditScreen(navController: NavController, resourceId: String) {
                 navController.navigate(ResourceEditPayload(resourceId))
+            }
+
+            @Composable
+            override fun ResourceHelpBottomSheet(
+                payload: ResourceHelpPayload,
+                dismissAction: () -> Unit,
+                bottomSheetState: SheetState,
+            ) {
+                com.demax.feature.resource.help.composable.ResourceHelpBottomSheet(
+                    payload = payload,
+                    dismissAction = dismissAction,
+                    bottomSheetState = bottomSheetState,
+                )
             }
         }
     }

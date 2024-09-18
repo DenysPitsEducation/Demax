@@ -12,7 +12,6 @@ import com.demax.feature.destruction.details.domain.model.AmountDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionDetailsDomainModel
 import com.demax.feature.destruction.details.domain.model.DestructionStatisticsDomainModel
 import com.demax.feature.destruction.details.domain.model.NeedDomainModel
-import com.demax.feature.destruction.details.domain.model.ResourceHelpBottomSheetDomainModel
 import com.demax.feature.destruction.details.domain.model.VolunteerHelpBottomSheetDomainModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.FieldPath
@@ -116,31 +115,6 @@ class DestructionDetailsRepositoryImpl(
                         .filter { it.isSelected }
                         .map { it.title },
                     resources = null,
-                )
-            )
-        }
-    }
-
-    override suspend fun sendResourceResponse(
-        destructionId: String,
-        resourceHelpBottomSheet: ResourceHelpBottomSheetDomainModel
-    ): Result<Unit> {
-        return runCatching {
-            val resourcesCollection = Firebase.firestore.collection("responses")
-            val resourceDocument = resourcesCollection.document
-            resourceDocument.set(
-                ResponseDataModel(
-                    profile = ResponseDataModel.Profile("1", "Denys", null),
-                    status = "idle",
-                    type = "resource",
-                    destructionId = null,
-                    specializations = null,
-                    resources = resourceHelpBottomSheet.needs.filter { it.isSelected }.map { resource ->
-                        ResponseDataModel.Resource(
-                            id = resource.id,
-                            quantity = resource.quantityText.toInt(),
-                        )
-                    },
                 )
             )
         }
