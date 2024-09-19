@@ -3,9 +3,8 @@ package com.demax.feature.profile.mapper
 import com.demax.feature.profile.domain.model.ProfileDomainModel
 import com.demax.feature.profile.model.ProfileUiModel
 import com.demax.feature.profile.mvi.ProfileState
-import kotlinx.datetime.toJavaLocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.byUnicodePattern
 
 internal class ProfileUiMapper {
 
@@ -14,16 +13,17 @@ internal class ProfileUiMapper {
     }
 
     private fun ProfileDomainModel.toUiModel(): ProfileUiModel {
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
+        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
         return ProfileUiModel(
-            imageUrl = imageUrl,
+            isGuest = isGuest,
+            image = imageFile?.uri ?: imageUrl,
             name = name,
             email = email,
-            phoneNumber = phoneNumber,
-            address = address,
-            about = about,
-            specializations = specializations,
-            registrationDate = formatter.format(registrationDate.toJavaLocalDate()),
+            phoneNumber = phoneNumber.orEmpty(),
+            address = address.orEmpty(),
+            description = description.orEmpty(),
+            specializations = specializations.orEmpty(),
+            registrationDate = formatter.format(registrationDate),
             helpsCount = helpsCount
         )
     }

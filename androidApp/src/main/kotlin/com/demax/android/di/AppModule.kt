@@ -17,6 +17,7 @@ import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
 import com.demax.feature.destruction.edit.navigation.DestructionEditPayload
 import com.demax.feature.destruction.edit.navigation.DestructionEditRouter
 import com.demax.feature.destructions.navigation.DestructionsRouter
+import com.demax.feature.profile.navigation.ProfilePayload
 import com.demax.feature.profile.navigation.ProfileRouter
 import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
 import com.demax.feature.resource.details.navigation.ResourceDetailsRouter
@@ -87,6 +88,9 @@ fun appModule() = module {
     }
     factory<ProfileRouter> {
         object : ProfileRouter {
+            override fun openHelpHistory() {
+                TODO("Not yet implemented")
+            }
         }
     }
     factory<ResourceDetailsRouter> {
@@ -127,7 +131,7 @@ fun appModule() = module {
     factory<ResponsesRouter> {
         object : ResponsesRouter {
             override fun openProfile(navController: NavController, id: String) {
-                // TODO Pits:  
+                navController.navigate(ProfilePayload(id))
             }
 
             override fun openDestructionDetails(navController: NavController, id: String) {

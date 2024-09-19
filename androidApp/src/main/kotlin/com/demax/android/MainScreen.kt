@@ -42,6 +42,7 @@ import com.demax.feature.resources.composable.ResourcesScreen
 import com.demax.feature.resources.navigation.ResourcesPayload
 import com.demax.feature.responses.composable.ResponsesScreen
 import com.demax.feature.responses.navigation.ResponsesPayload
+import dev.gitlive.firebase.Firebase
 
 @Composable
 fun MainScreen() {
@@ -70,7 +71,7 @@ fun MainScreen() {
                     NavigationBarItemModel(
                         text = "Профіль",
                         icon = Icons.Default.AccountCircle,
-                        payload = ProfilePayload
+                        payload = ProfilePayload(profileId = null)
                     ),
                 )
                 items.forEachIndexed { index, item ->
@@ -126,8 +127,11 @@ fun MainScreen() {
             composable<DestructionsPayload> {
                 DestructionsScreen(navController)
             }
-            composable<ProfilePayload> {
-                ProfileScreen(navController)
+            composable<ProfilePayload> { backStackEntry ->
+                ProfileScreen(
+                    navController = navController,
+                    payload = backStackEntry.toRoute(),
+                )
             }
             composable<ResourceDetailsPayload> { backStackEntry ->
                 ResourceDetailsScreen(

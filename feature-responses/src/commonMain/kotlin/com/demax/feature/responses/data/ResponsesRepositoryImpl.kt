@@ -1,11 +1,10 @@
 package com.demax.feature.responses.data
 
 import com.demax.core.data.mapper.ResourceCategoryDomainMapper
-import com.demax.core.data.model.AmountDataModel
 import com.demax.core.data.model.DestructionDataModel
+import com.demax.core.data.model.ProfileDataModel
 import com.demax.core.data.model.ResourceDataModel
 import com.demax.core.data.model.ResponseDataModel
-import com.demax.core.data.model.VolunteerNeedDataModel
 import com.demax.feature.responses.domain.ResponsesRepository
 import com.demax.feature.responses.domain.model.DestructionDomainModel
 import com.demax.feature.responses.domain.model.ProfileDomainModel
@@ -31,6 +30,15 @@ class ResponsesRepositoryImpl(
                 document.id to document.data(ResponseDataModel.serializer())
             }
 
+            val profileIds = responseDataModels.flatMap { listOf(it.second.profileId) }
+            val profiles = if (profileIds.isNotEmpty()) {
+                database.collection("profiles")
+                    .where { FieldPath.documentId inArray profileIds }
+                    .get().documents.associate { document ->
+                        document.id to document.data(ProfileDataModel.serializer())
+                    }
+            } else emptyMap()
+
             val destructionIds =
                 responseDataModels.flatMap { listOfNotNull(it.second.destructionId) }
             val destructions = if (destructionIds.isNotEmpty()) {
@@ -53,20 +61,22 @@ class ResponsesRepositoryImpl(
             } else emptyMap()
 
             responseDataModels.map { (id, response) ->
-                response.toDomainModel(id, destructions, resources)
+                response.toDomainModel(id, profiles, destructions, resources)
             }
         }
     }
 
     private fun ResponseDataModel.toDomainModel(
         id: String,
+        profiles: Map<String, ProfileDataModel>,
         destructions: Map<String, DestructionDataModel>,
         resources: Map<String, ResourceDataModel>
     ): ResponseDomainModel {
+        val profile = profiles.getValue(profileId)
         return ResponseDomainModel(
             id = id,
             profile = ProfileDomainModel(
-                id = profile.id,
+                id = profileId,
                 name = profile.name,
                 imageUrl = profile.imageUrl,
             ),
@@ -107,6 +117,7 @@ class ResponsesRepositoryImpl(
     override suspend fun approveResponse(response: ResponseDomainModel): Result<Unit> {
         return runCatching {
             val responsesCollection = Firebase.firestore.collection("responses")
+            val profilesCollection = Firebase.firestore.collection("profiles")
             when (response.type) {
                 is ResponseTypeDomainModel.Resource -> {
                     val resourcesCollection = Firebase.firestore.collection("resources")
@@ -115,6 +126,7 @@ class ResponsesRepositoryImpl(
                             update(resourcesCollection.document(resource.id), "amount.currentAmount" to FieldValue.increment(resource.quantity))
                         }
                         update(responsesCollection.document(response.id), "status" to "approved")
+                        update(profilesCollection.document(response.profile.id), "helpsCount" to FieldValue.increment(1))
                     }.commit()
                 }
                 is ResponseTypeDomainModel.Volunteer -> {
@@ -133,6 +145,7 @@ class ResponsesRepositoryImpl(
                     Firebase.firestore.batch().apply {
                         update(destructionDocument, "volunteerNeeds" to updatedVolunteerNeeds)
                         update(responsesCollection.document(response.id), "status" to "approved")
+                        update(profilesCollection.document(response.profile.id), "helpsCount" to FieldValue.increment(1))
                     }.commit()
                 }
             }

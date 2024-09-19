@@ -14,6 +14,7 @@ import com.demax.feature.destruction.details.domain.model.DestructionStatisticsD
 import com.demax.feature.destruction.details.domain.model.NeedDomainModel
 import com.demax.feature.destruction.details.domain.model.VolunteerHelpBottomSheetDomainModel
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.FieldPath
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.firestore.where
@@ -107,7 +108,7 @@ class DestructionDetailsRepositoryImpl(
             val resourceDocument = resourcesCollection.document
             resourceDocument.set(
                 ResponseDataModel(
-                    profile = ResponseDataModel.Profile("1", "Denys", null),
+                    profileId = Firebase.auth.currentUser?.uid ?: throw Exception("User not found"),
                     status = "idle",
                     type = "volunteer",
                     destructionId = destructionId,

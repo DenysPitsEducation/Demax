@@ -18,7 +18,7 @@ internal class ResourceEditUiMapper(
 
     private fun ResourceEditDomainModel.toUiModel(): ResourceEditUiModel {
         return ResourceEditUiModel(
-            image = imageUrl ?: imageFile?.uri,
+            image = imageFile?.uri ?: imageUrl,
             name = name.orEmpty(),
             category = category?.let { categoryUiMapper.mapToUiModel(it) }.orEmpty(),
             dropDownCategories = ResourceCategoryDomainModel.entries.map {

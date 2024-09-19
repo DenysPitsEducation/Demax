@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -63,6 +64,19 @@ private fun RegistrationContent(state: RegistrationState, onUserInteraction: OnU
             style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(30.dp))
+        OutlinedTextField(
+            value = state.name,
+            onValueChange = {
+                onUserInteraction(RegistrationIntent.NameInputChanged(it))
+            },
+            placeholder = {
+                Text(text = "Імʼя")
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
             value = state.email,
             onValueChange = {
@@ -138,7 +152,7 @@ private fun RegistrationContent(state: RegistrationState, onUserInteraction: OnU
 private fun LoginComposablePreview() {
     PreviewContainer {
         RegistrationContent(
-            state = RegistrationState(email = "", password = "", passwordConfirmation = ""),
+            state = RegistrationState(name = "", email = "", password = "", passwordConfirmation = ""),
             onUserInteraction = {},
         )
     }

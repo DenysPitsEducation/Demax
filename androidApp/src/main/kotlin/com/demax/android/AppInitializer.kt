@@ -5,6 +5,7 @@ import com.demax.core.data.model.DestructionStatisticsDataModel
 import com.demax.core.data.model.VolunteerNeedDataModel
 import com.demax.core.data.model.DestructionDataModel
 import com.demax.core.data.model.ResourceDataModel
+import com.demax.core.data.model.ProfileDataModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,7 @@ class AppInitializer {
         CoroutineScope(Dispatchers.IO).launch {
             // initDestructions()
             // initResources()
+            // initProfile()
         }
     }
 
@@ -115,5 +117,23 @@ class AppInitializer {
                 set(collection.document(index.toString()), resource)
             }
         }.commit()
+    }
+
+    private suspend fun initProfile() {
+        val database = Firebase.firestore
+        val collection = database.collection("profiles")
+        val id = "UHRzU915ZYhkn2GANpu2uAeMRZ93"
+        val model = ProfileDataModel(
+            imageUrl = "https://picsum.photos/seed/profile$id/200",
+            name = "Фонд Допомоги Постраждалим",
+            email = "fund@gmail.com",
+            phoneNumber = "380958311553",
+            address = "м. Київ, вул. Володимирська 4",
+            description = "Свою місію я вбачаю в активній волонтерській діяльності, що спрямована на підтримку обороноздатності країни",
+            specializations = listOf("Психотерапія", "Керування вантажівкою"),
+            registrationDate = "2014-07-08",
+            helpsCount = 4,
+        )
+        collection.document(id).set(model)
     }
 }

@@ -7,6 +7,7 @@ interface AuthorizationRepository {
     ): Result<Unit>
 
     suspend fun register(
+        name: String,
         email: String,
         password: String,
     ): Result<Unit>

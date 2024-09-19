@@ -4,6 +4,7 @@ import com.demax.core.data.model.ResponseDataModel
 import com.demax.feature.resource.help.domain.model.ResourceHelpBottomSheetDomainModel
 import com.demax.feature.resource.help.domain.repository.ResourceHelpRepository
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 
 class ResourceHelpRepositoryImpl : ResourceHelpRepository {
@@ -15,7 +16,7 @@ class ResourceHelpRepositoryImpl : ResourceHelpRepository {
             val resourceDocument = resourcesCollection.document
             resourceDocument.set(
                 ResponseDataModel(
-                    profile = ResponseDataModel.Profile("1", "Denys", null),
+                    profileId = Firebase.auth.currentUser?.uid ?: throw Exception("User not found"),
                     status = "idle",
                     type = "resource",
                     destructionId = null,

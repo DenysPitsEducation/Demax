@@ -27,6 +27,7 @@ import com.demax.feature.authorization.passwordReset.PasswordResetScreen
 import com.demax.feature.authorization.passwordReset.PasswordResetPayload
 import com.demax.feature.authorization.registration.RegistrationScreen
 import com.demax.feature.authorization.registration.RegistrationPayload
+import com.google.rpc.context.AttributeContext.Auth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

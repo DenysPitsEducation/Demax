@@ -1,6 +1,10 @@
 package com.demax.feature.authorization.registration
 
 sealed interface RegistrationIntent {
+    data class NameInputChanged(
+        val input: String,
+    ) : RegistrationIntent
+
     data class EmailInputChanged(
         val input: String,
     ) : RegistrationIntent

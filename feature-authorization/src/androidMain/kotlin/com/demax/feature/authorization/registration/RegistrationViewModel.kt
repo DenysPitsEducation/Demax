@@ -12,10 +12,11 @@ class RegistrationViewModel(
     private val repository: AuthorizationRepository,
 ) : ViewModel(),
     Mvi<RegistrationState, RegistrationIntent, RegistrationSideEffect> by
-    createMviDelegate(RegistrationState(email = "", password = "", passwordConfirmation = "")) {
+    createMviDelegate(RegistrationState(name = "", email = "", password = "", passwordConfirmation = "")) {
 
     override fun onIntent(intent: RegistrationIntent) {
         when (intent) {
+            is RegistrationIntent.NameInputChanged -> onNameInputChanged(intent)
             is RegistrationIntent.EmailInputChanged -> onEmailInputChanged(intent)
             is RegistrationIntent.PasswordInputChanged -> onPasswordInputChanged(intent)
             is RegistrationIntent.PasswordConfirmationInputChanged -> onPasswordConfirmationInputChanged(
@@ -25,6 +26,10 @@ class RegistrationViewModel(
             is RegistrationIntent.CreateAccountClicked -> onCreateAccountClicked()
             is RegistrationIntent.LoginClicked -> onLoginClicked()
         }
+    }
+
+    private fun onNameInputChanged(intent: RegistrationIntent.NameInputChanged) {
+        updateUiState { copy(name = intent.input) }
     }
 
     private fun onEmailInputChanged(intent: RegistrationIntent.EmailInputChanged) {
@@ -40,11 +45,13 @@ class RegistrationViewModel(
     }
 
     private fun onCreateAccountClicked() = viewModelScope.launch {
+        val name = getState().name
         val email = getState().email
         val password = getState().password
         val passwordConfirmation = getState().passwordConfirmation
         if (password == passwordConfirmation) {
             repository.register(
+                name = name,
                 email = email,
                 password = password
             ).onSuccess {

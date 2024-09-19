@@ -1,13 +1,14 @@
 package com.demax.feature.profile.mvi
 
+import dev.gitlive.firebase.storage.File
+
 sealed interface ProfileIntent {
-    data class SearchInputChanged(val input: String) : ProfileIntent
-
-    data object SortClicked : ProfileIntent
-
-    data object FilterClicked : ProfileIntent
-
-    data object AddDestructionClicked : ProfileIntent
-
-    data class DestructionClicked(val id: Long) : ProfileIntent
+    data class ImageSelected(val file: File) : ProfileIntent
+    data class NameInputChanged(val input: String) : ProfileIntent
+    data class EmailInputChanged(val input: String) : ProfileIntent
+    data class PhoneInputChanged(val input: String) : ProfileIntent
+    data class AddressInputChanged(val input: String) : ProfileIntent
+    data class DescriptionInputChanged(val input: String) : ProfileIntent
+    data object SaveButtonClicked : ProfileIntent
+    data object HelpHistoryButtonClicked : ProfileIntent
 }

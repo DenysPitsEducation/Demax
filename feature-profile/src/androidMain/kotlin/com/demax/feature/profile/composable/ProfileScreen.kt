@@ -1,7 +1,11 @@
 package com.demax.feature.profile.composable
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,14 +44,18 @@ import com.demax.feature.profile.ProfileViewModel
 import com.demax.feature.profile.mapper.ProfileUiMapper
 import com.demax.feature.profile.model.ProfileUiModel
 import com.demax.feature.profile.mvi.ProfileIntent
+import com.demax.feature.profile.mvi.ProfileSideEffect
+import com.demax.feature.profile.navigation.ProfilePayload
 import com.demax.feature.profile.navigation.ProfileRouter
+import dev.gitlive.firebase.storage.File
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 internal typealias OnUserInteraction = (ProfileIntent) -> Unit
 
 @Composable
-fun ProfileScreen(navController: NavHostController) {
-    val viewModel: ProfileViewModel = koinInject()
+fun ProfileScreen(navController: NavHostController, payload: ProfilePayload) {
+    val viewModel: ProfileViewModel = koinInject(parameters = { parametersOf(payload) })
     val router: ProfileRouter = koinInject()
     val mapper: ProfileUiMapper = koinInject()
     val state = viewModel.uiState.collectAsState().value
@@ -57,12 +65,10 @@ fun ProfileScreen(navController: NavHostController) {
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
-        /*when (sideEffect) {
-            is DestructionsSideEffect.OpenMainScreen -> router.openMainScreen(navController)
-            is DestructionsSideEffect.OpenPasswordResetScreen -> router.openPasswordResetScreen(navController)
-            is DestructionsSideEffect.OpenRegistrationScreen -> router.openRegistrationScreen(navController)
-            is DestructionsSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
-        }*/
+        when (sideEffect) {
+            is ProfileSideEffect.OpenHelpHistory -> router.openHelpHistory()
+            is ProfileSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
+        }
     }
 
     if (uiModel != null) {
@@ -83,6 +89,12 @@ private fun ProfileContent(
     model: ProfileUiModel,
     onUserInteraction: OnUserInteraction,
 ) {
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            onUserInteraction(ProfileIntent.ImageSelected(File(uri)))
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,11 +108,14 @@ private fun ProfileContent(
         )
         Spacer(modifier = Modifier.height(20.dp))
         AsyncImage(
-            model = model.imageUrl,
+            model = model.image,
             contentDescription = null,
             modifier = Modifier
                 .border(1.dp, Color(0xFFA8A8A9), CircleShape)
                 .clip(CircleShape)
+                .clickable(enabled = !model.isGuest) {
+                    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }
                 .size(100.dp)
                 .align(Alignment.CenterHorizontally),
             contentScale = ContentScale.Crop,
@@ -114,8 +129,9 @@ private fun ProfileContent(
         OutlinedTextField(
             value = model.name,
             onValueChange = {
-
+                onUserInteraction(ProfileIntent.NameInputChanged(it))
             },
+            readOnly = model.isGuest,
             label = { Text(text = "ПІБ") },
             modifier = Modifier.fillMaxWidth(),
         )
@@ -123,8 +139,9 @@ private fun ProfileContent(
         OutlinedTextField(
             value = model.email,
             onValueChange = {
-
+                onUserInteraction(ProfileIntent.EmailInputChanged(it))
             },
+            readOnly = model.isGuest,
             label = { Text(text = "Електронна пошта") },
             modifier = Modifier.fillMaxWidth(),
         )
@@ -132,8 +149,9 @@ private fun ProfileContent(
         OutlinedTextField(
             value = model.phoneNumber,
             onValueChange = {
-
+                onUserInteraction(ProfileIntent.PhoneInputChanged(it))
             },
+            readOnly = model.isGuest,
             label = { Text(text = "Номер телефону") },
             modifier = Modifier.fillMaxWidth(),
         )
@@ -141,28 +159,32 @@ private fun ProfileContent(
         OutlinedTextField(
             value = model.address,
             onValueChange = {
-
+                onUserInteraction(ProfileIntent.AddressInputChanged(it))
             },
+            readOnly = model.isGuest,
             label = { Text(text = "Домашня адреса") },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
-            value = model.about,
+            value = model.description,
             onValueChange = {
-
+                onUserInteraction(ProfileIntent.DescriptionInputChanged(it))
             },
+            readOnly = model.isGuest,
             label = { Text(text = "Про себе") },
             modifier = Modifier.fillMaxWidth(),
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        Button(
-            onClick = {
-                //onUserInteraction(LoginIntent.LoginClicked)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Зберегти зміни")
+        if (!model.isGuest) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = {
+                    onUserInteraction(ProfileIntent.SaveButtonClicked)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Зберегти зміни")
+            }
         }
         Spacer(modifier = Modifier.height(12.dp))
         Text(
@@ -215,7 +237,7 @@ private fun ProfileContent(
         Spacer(modifier = Modifier.height(8.dp))
         Button(
             onClick = {
-                //onUserInteraction(LoginIntent.LoginClicked)
+                onUserInteraction(ProfileIntent.HelpHistoryButtonClicked)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -241,23 +263,35 @@ private fun SpecializationComposable(
 }
 
 internal fun createProfileUiModelMock() = ProfileUiModel(
-    imageUrl = "https://picsum.photos/200/200",
+    image = "https://picsum.photos/200/200",
     name = "Фонд Допомоги Постраждалим",
     email = "fund@gmail.com",
     phoneNumber = "380958311553",
     address = "м. Київ, вул. Володимирська 4",
-    about = "Свою місію я вбачаю в активній волонтерській діяльності, що спрямована на підтримку обороноздатності країни",
+    description = "Свою місію я вбачаю в активній волонтерській діяльності, що спрямована на підтримку обороноздатності країни",
     specializations = listOf("Психотерапія", "Керування вантажівкою"),
     registrationDate = "21/04/2023",
     helpsCount = 4,
+    isGuest = false,
 )
 
 @Composable
 @Preview
-private fun ProfileContentPreview() {
+private fun MyProfileContentPreview() {
     PreviewContainer {
         ProfileContent(
-            model = createProfileUiModelMock(),
+            model = createProfileUiModelMock().copy(isGuest = false),
+            onUserInteraction = {},
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun GuestMyProfileContentPreview() {
+    PreviewContainer {
+        ProfileContent(
+            model = createProfileUiModelMock().copy(isGuest = true),
             onUserInteraction = {},
         )
     }
