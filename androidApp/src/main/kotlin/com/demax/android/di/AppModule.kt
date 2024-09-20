@@ -17,6 +17,8 @@ import com.demax.feature.destruction.details.navigation.DestructionDetailsRouter
 import com.demax.feature.destruction.edit.navigation.DestructionEditPayload
 import com.demax.feature.destruction.edit.navigation.DestructionEditRouter
 import com.demax.feature.destructions.navigation.DestructionsRouter
+import com.demax.feature.help.history.navigation.HelpHistoryPayload
+import com.demax.feature.help.history.navigation.HelpHistoryRouter
 import com.demax.feature.profile.navigation.ProfilePayload
 import com.demax.feature.profile.navigation.ProfileRouter
 import com.demax.feature.resource.details.navigation.ResourceDetailsPayload
@@ -86,10 +88,25 @@ fun appModule() = module {
             }
         }
     }
+    factory<HelpHistoryRouter> {
+        object : HelpHistoryRouter {
+            override fun openProfile(navController: NavController, id: String) {
+                navController.navigate(ProfilePayload(id))
+            }
+
+            override fun openDestructionDetails(navController: NavController, id: String) {
+                navController.navigate(DestructionDetailsPayload(id))
+            }
+
+            override fun openResourceDetails(navController: NavController, id: String) {
+                navController.navigate(ResourceDetailsPayload(id))
+            }
+        }
+    }
     factory<ProfileRouter> {
         object : ProfileRouter {
-            override fun openHelpHistory() {
-                TODO("Not yet implemented")
+            override fun openHelpHistory(navController: NavController, profileId: String) {
+                navController.navigate(HelpHistoryPayload(profileId))
             }
         }
     }

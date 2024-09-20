@@ -57,6 +57,7 @@ dependencies {
     implementation(projects.featureDestructionDetails)
     implementation(projects.featureDestructionEdit)
     implementation(projects.featureDestructions)
+    implementation(projects.featureHelpHistory)
     implementation(projects.featureProfile)
     implementation(projects.featureResourceDetails)
     implementation(projects.featureResourceEdit)

@@ -32,6 +32,8 @@ import com.demax.feature.destruction.edit.composable.DestructionEditScreen
 import com.demax.feature.destruction.edit.navigation.DestructionEditPayload
 import com.demax.feature.destructions.navigation.DestructionsPayload
 import com.demax.feature.destructions.composable.DestructionsScreen
+import com.demax.feature.help.history.composable.HelpHistoryScreen
+import com.demax.feature.help.history.navigation.HelpHistoryPayload
 import com.demax.feature.profile.composable.ProfileScreen
 import com.demax.feature.profile.navigation.ProfilePayload
 import com.demax.feature.resource.details.composable.ResourceDetailsScreen
@@ -126,6 +128,12 @@ fun MainScreen() {
             }
             composable<DestructionsPayload> {
                 DestructionsScreen(navController)
+            }
+            composable<HelpHistoryPayload> { backStackEntry ->
+                HelpHistoryScreen(
+                    navController = navController,
+                    payload = backStackEntry.toRoute(),
+                )
             }
             composable<ProfilePayload> { backStackEntry ->
                 ProfileScreen(

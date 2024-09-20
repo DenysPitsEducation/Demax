@@ -5,6 +5,7 @@ import com.demax.feature.authorization.common.di.featureAuthorizationModule
 import com.demax.feature.destruction.details.di.featureDestructionDetailsModule
 import com.demax.feature.destruction.edit.di.featureDestructionEditModule
 import com.demax.feature.destructions.di.featureDestructionsModule
+import com.demax.feature.help.history.di.featureHelpHistoryModule
 import com.demax.feature.profile.di.featureProfileModule
 import com.demax.feature.resource.details.di.featureResourceDetailsModule
 import com.demax.feature.resource.edit.di.featureResourceEditModule
@@ -19,6 +20,7 @@ fun getAllKoinModules() = listOf(
     featureDestructionDetailsModule(),
     featureDestructionEditModule(),
     featureDestructionsModule(),
+    featureHelpHistoryModule(),
     featureProfileModule(),
     featureResourceDetailsModule(),
     featureResourceEditModule(),

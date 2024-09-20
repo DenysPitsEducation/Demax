@@ -86,6 +86,6 @@ class ProfileViewModel(
     }
 
     private fun onHelpHistoryButtonClicked() {
-        viewModelScope.emitSideEffect(ProfileSideEffect.OpenHelpHistory)
+        viewModelScope.emitSideEffect(ProfileSideEffect.OpenHelpHistory(payload.profileId ?: Firebase.auth.currentUser!!.uid))
     }
 }

@@ -66,7 +66,7 @@ fun ProfileScreen(navController: NavHostController, payload: ProfilePayload) {
         sideEffectsFlow = viewModel.sideEffects,
     ) { sideEffect ->
         when (sideEffect) {
-            is ProfileSideEffect.OpenHelpHistory -> router.openHelpHistory()
+            is ProfileSideEffect.OpenHelpHistory -> router.openHelpHistory(navController, sideEffect.profileId)
             is ProfileSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }
