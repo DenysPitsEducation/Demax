@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,12 +20,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,10 +54,12 @@ import com.demax.feature.resources.model.ResourcesUiModel
 import com.demax.feature.resources.mvi.ResourcesIntent
 import com.demax.feature.resources.mvi.ResourcesSideEffect
 import com.demax.feature.resources.navigation.ResourcesRouter
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 internal typealias OnUserInteraction = (ResourcesIntent) -> Unit
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResourcesScreen(navController: NavHostController) {
     val viewModel: ResourcesViewModel = koinInject()
@@ -54,6 +68,10 @@ fun ResourcesScreen(navController: NavHostController) {
     val state = viewModel.uiState.collectAsState().value
     val uiModel = mapper.mapToUiModel(state)
     val snackbarHostState = LocalSnackbarHostState.current
+    val scope = rememberCoroutineScope()
+    val filterBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showFilterBottomSheet by remember { mutableStateOf(false) }
+    val onUserInteraction: OnUserInteraction = { viewModel.onIntent(it) }
 
     SideEffectLaunchedEffect(
         sideEffectsFlow = viewModel.sideEffects,
@@ -61,11 +79,81 @@ fun ResourcesScreen(navController: NavHostController) {
         when (sideEffect) {
             is ResourcesSideEffect.OpenResourceDetails -> router.openResourceDetails(navController, sideEffect.id)
             is ResourcesSideEffect.OpenResourceEdit -> router.openResourceEdit(navController)
+            is ResourcesSideEffect.OpenFilterBottomSheet -> {
+                showFilterBottomSheet = true
+                filterBottomSheetState.show()
+            }
             is ResourcesSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }
 
-    ResourcesContent(model = uiModel, onUserInteraction = { viewModel.onIntent(it) })
+    ResourcesContent(model = uiModel, onUserInteraction = onUserInteraction)
+
+    if (showFilterBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showFilterBottomSheet = false
+            },
+            sheetState = filterBottomSheetState,
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                Text(
+                    text = "Фільтрувати",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                uiModel.filterUiModels.forEachIndexed { index, filter ->
+                    if (index != 0) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                    Text(
+                        text = filter.title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    filter.options.forEach { filterOption ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onUserInteraction(
+                                        ResourcesIntent.FilterOptionClicked(
+                                            filterOption.type
+                                        )
+                                    )
+                                }
+                        ) {
+                            Checkbox(
+                                checked = filterOption.isSelected,
+                                modifier = Modifier.size(40.dp),
+                                onCheckedChange = {
+                                    onUserInteraction(ResourcesIntent.FilterOptionClicked(filterOption.type))
+                                },
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(filterOption.title)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scope.launch {
+                            filterBottomSheetState.hide()
+                            showFilterBottomSheet = false
+                        }
+                    }
+                ) {
+                    Text("Обрати фільтр")
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
+    }
 }
 
 @Composable
@@ -189,6 +277,7 @@ private fun ResourcesContentPreview() {
         ResourcesContent(
             model = ResourcesUiModel(
                 searchInput = "",
+                filterUiModels = listOf(),
                 showAddDestructionButton = true,
                 resourceUiModels = createResourceUiModelsMock()
             ),

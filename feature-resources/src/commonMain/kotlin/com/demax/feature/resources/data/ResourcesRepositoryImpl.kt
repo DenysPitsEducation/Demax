@@ -3,6 +3,7 @@ package com.demax.feature.resources.data
 import com.demax.core.data.model.ResourceDataModel
 import com.demax.feature.resources.domain.ResourcesRepository
 import com.demax.core.data.mapper.ResourceCategoryDomainMapper
+import com.demax.core.domain.model.StatusDomainModel
 import com.demax.feature.resources.domain.model.ResourceDomainModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
@@ -29,6 +30,11 @@ class ResourcesRepositoryImpl(
                 currentAmount = amount.currentAmount,
                 totalAmount = amount.totalAmount,
             ),
+            status = if (amount.currentAmount >= amount.totalAmount) {
+                StatusDomainModel.COMPLETED
+            } else {
+                StatusDomainModel.ACTIVE
+            }
         )
     }
 }
