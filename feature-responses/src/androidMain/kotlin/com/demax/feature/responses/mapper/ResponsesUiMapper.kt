@@ -1,11 +1,16 @@
 package com.demax.feature.responses.mapper
 
 import androidx.compose.ui.graphics.Color
+import com.demax.core.domain.model.StatusDomainModel
 import com.demax.core.ui.mapper.ResourceCategoryUiMapper
+import com.demax.feature.responses.domain.model.FilterOptionDomainModel
 import com.demax.feature.responses.domain.model.ProfileDomainModel
 import com.demax.feature.responses.domain.model.ResponseDomainModel
 import com.demax.feature.responses.domain.model.ResponseTypeDomainModel
+import com.demax.feature.responses.domain.model.ResponseTypeEnumDomainModel
 import com.demax.feature.responses.model.DestructionUiModel
+import com.demax.feature.responses.model.FilterOptionUiModel
+import com.demax.feature.responses.model.FilterUiModel
 import com.demax.feature.responses.model.ProfileUiModel
 import com.demax.feature.responses.model.ResourceUiModel
 import com.demax.feature.responses.model.ResponseTypeUiModel
@@ -21,12 +26,39 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 internal class ResponsesUiMapper(
-    val resourceCategoryMapper: ResourceCategoryUiMapper,
+    private val resourceCategoryMapper: ResourceCategoryUiMapper,
 ) {
 
     fun mapToUiModel(state: ResponsesState): ResponsesUiModel = state.run {
         return ResponsesUiModel(
-            responseUiModels = responses.map { it.toUiModel() }
+            filterUiModels = filters.toUiModel(),
+            responseUiModels = visibleResponses.map { it.toUiModel() }
+        )
+    }
+
+    private fun List<FilterOptionDomainModel>.toUiModel(): List<FilterUiModel> {
+        val groups = groupBy { it.type::class }
+        return groups.mapNotNull { (typeClass, options) ->
+            FilterUiModel(
+                title = when (typeClass) {
+                    FilterOptionDomainModel.Type.ResponseType::class -> "Тип відгуку"
+                    else -> return@mapNotNull null
+                },
+                options = options.map { it.toUiModel() }
+            )
+        }
+    }
+
+    private fun FilterOptionDomainModel.toUiModel(): FilterOptionUiModel {
+        return FilterOptionUiModel(
+            type = type,
+            title = when (type) {
+                is FilterOptionDomainModel.Type.ResponseType -> when (type.type) {
+                    ResponseTypeEnumDomainModel.RESOURCE -> "Ресурс"
+                    ResponseTypeEnumDomainModel.VOLUNTEER -> "Волонтер"
+                }
+            },
+            isSelected = isSelected
         )
     }
 

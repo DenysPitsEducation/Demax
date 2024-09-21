@@ -1,9 +1,11 @@
 package com.demax.feature.responses.mvi
 
-sealed interface ResponsesIntent {
-    data object SortClicked : ResponsesIntent
+import com.demax.feature.responses.domain.model.FilterOptionDomainModel
 
+sealed interface ResponsesIntent {
     data object FilterClicked : ResponsesIntent
+
+    data class FilterOptionClicked(val type: FilterOptionDomainModel.Type) : ResponsesIntent
 
     data class ProfileClicked(val profileId: String) : ResponsesIntent
 

@@ -50,14 +50,14 @@ class ResourcesViewModel(
                 isSelected = false,
             )
         }
-        val buildingTypeFilters = categories.map { category ->
+        val categoryFilters = categories.map { category ->
             FilterOptionDomainModel(
                 type = FilterOptionDomainModel.Type.Category(category),
                 isSelected = false,
             )
         }
 
-        return statusFilters + buildingTypeFilters
+        return statusFilters + categoryFilters
     }
 
     override fun onIntent(intent: ResourcesIntent) {

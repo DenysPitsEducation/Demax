@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.demax.core.mvi.Mvi
 import com.demax.core.mvi.createMviDelegate
 import com.demax.feature.responses.domain.ResponsesRepository
+import com.demax.feature.responses.domain.model.FilterOptionDomainModel
 import com.demax.feature.responses.domain.model.ResponseDomainModel
+import com.demax.feature.responses.domain.model.ResponseTypeDomainModel
+import com.demax.feature.responses.domain.model.toEnum
 import com.demax.feature.responses.mvi.ResponsesIntent
 import com.demax.feature.responses.mvi.ResponsesSideEffect
 import com.demax.feature.responses.mvi.ResponsesState
@@ -18,22 +21,41 @@ class ResponsesViewModel(
     Mvi<ResponsesState, ResponsesIntent, ResponsesSideEffect> by
     createMviDelegate(
         ResponsesState(
+            filters = listOf(),
             responses = listOf()
         )
     ) {
 
     init {
         viewModelScope.launch {
-            repository.getResponses().onSuccess { destructions ->
-                updateUiState { copy(responses = destructions) }
+            repository.getResponses().onSuccess { responses ->
+                updateUiState { copy(
+                    filters = getFilters(responses),
+                    responses = responses
+                ) }
             }.onFailure { it.printStackTrace() }
         }
     }
 
+    private fun getFilters(responses: List<ResponseDomainModel>): List<FilterOptionDomainModel> {
+        val types = responses
+            .map { it.type.toEnum() }
+            .distinct()
+
+        val typeFilters = types.map { type ->
+            FilterOptionDomainModel(
+                type = FilterOptionDomainModel.Type.ResponseType(type),
+                isSelected = false,
+            )
+        }
+
+        return typeFilters
+    }
+
     override fun onIntent(intent: ResponsesIntent) {
         when (intent) {
-            is ResponsesIntent.SortClicked -> onSortClicked()
             is ResponsesIntent.FilterClicked -> onFilterClicked()
+            is ResponsesIntent.FilterOptionClicked -> onFilterOptionClicked(intent)
             is ResponsesIntent.ProfileClicked -> onProfileClicked(intent)
             is ResponsesIntent.DestructionClicked -> onDestructionClicked(intent)
             is ResponsesIntent.ResourceClicked -> onResourceClicked(intent)
@@ -42,12 +64,20 @@ class ResponsesViewModel(
         }
     }
 
-    private fun onSortClicked() {
-        TODO("Not yet implemented")
+    private fun onFilterClicked() {
+        viewModelScope.emitSideEffect(ResponsesSideEffect.OpenFilterBottomSheet)
     }
 
-    private fun onFilterClicked() {
-        TODO("Not yet implemented")
+    private fun onFilterOptionClicked(intent: ResponsesIntent.FilterOptionClicked) {
+        updateUiState {
+            copy(filters = filters.map { filter ->
+                if (filter.type == intent.type) {
+                    filter.copy(isSelected = !filter.isSelected)
+                } else {
+                    filter
+                }
+            })
+        }
     }
 
     private fun onProfileClicked(intent: ResponsesIntent.ProfileClicked) {
