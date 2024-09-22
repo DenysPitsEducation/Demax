@@ -27,7 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -206,20 +205,22 @@ private fun ResourcesContent(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        onUserInteraction(ResourcesIntent.AddResourceClicked)
-                    }
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+            if (model.showAddResourceButton) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            onUserInteraction(ResourcesIntent.AddResourceClicked)
+                        }
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -278,7 +279,7 @@ private fun ResourcesContentPreview() {
             model = ResourcesUiModel(
                 searchInput = "",
                 filterUiModels = listOf(),
-                showAddDestructionButton = true,
+                showAddResourceButton = true,
                 resourceUiModels = createResourceUiModelsMock()
             ),
             onUserInteraction = {},

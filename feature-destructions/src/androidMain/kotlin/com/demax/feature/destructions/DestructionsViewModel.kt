@@ -2,6 +2,7 @@ package com.demax.feature.destructions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demax.core.domain.repository.UserRepository
 import com.demax.core.mvi.Mvi
 import com.demax.core.mvi.createMviDelegate
 import com.demax.feature.destructions.domain.DestructionsRepository
@@ -12,10 +13,12 @@ import com.demax.feature.destructions.domain.model.SortingTypeDomainModel
 import com.demax.feature.destructions.mvi.DestructionsIntent
 import com.demax.feature.destructions.mvi.DestructionsSideEffect
 import com.demax.feature.destructions.mvi.DestructionsState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 internal class DestructionsViewModel(
     private val repository: DestructionsRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel(),
     Mvi<DestructionsState, DestructionsIntent, DestructionsSideEffect> by
     createMviDelegate(
@@ -31,7 +34,12 @@ internal class DestructionsViewModel(
     ) {
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserFlow().collect {
+                updateUiState { copy(isAdministrator = it?.isAdministrator == true) }
+            }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
             repository.getDestructions().onSuccess { destructions ->
                 updateUiState {
                     copy(

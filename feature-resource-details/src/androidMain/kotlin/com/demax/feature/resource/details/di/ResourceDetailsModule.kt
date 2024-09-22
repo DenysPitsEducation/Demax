@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 fun featureResourceDetailsModule() = module {
     viewModel<ResourceDetailsViewModel> { (payload: ResourceDetailsPayload) ->
-        ResourceDetailsViewModel(payload = payload, repository = get())
+        ResourceDetailsViewModel(payload = payload, repository = get(), userRepository = get())
     }
     factoryOf(::ResourceDetailsUiMapper)
     factoryOf(::ResourceDetailsRepositoryImpl) { bind<ResourceDetailsRepository>() }

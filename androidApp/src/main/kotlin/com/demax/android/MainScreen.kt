@@ -20,12 +20,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.demax.core.domain.repository.UserRepository
 import com.demax.feature.destruction.details.composable.DestructionDetailsScreen
 import com.demax.feature.destruction.details.navigation.DestructionDetailsPayload
 import com.demax.feature.destruction.edit.composable.DestructionEditScreen
@@ -45,16 +47,20 @@ import com.demax.feature.resources.navigation.ResourcesPayload
 import com.demax.feature.responses.composable.ResponsesScreen
 import com.demax.feature.responses.navigation.ResponsesPayload
 import dev.gitlive.firebase.Firebase
+import org.koin.compose.koinInject
 
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val userRepository: UserRepository = koinInject()
+    val user by userRepository.getUserFlow().collectAsStateWithLifecycle(initialValue = null)
+    val showResponses = user?.isAdministrator == true
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
         bottomBar = {
             NavigationBar {
                 var selectedItem by remember { mutableIntStateOf(0) }
-                val items = listOf(
+                val items = listOfNotNull(
                     NavigationBarItemModel(
                         text = "Руйнування",
                         icon = Icons.Default.Search,
@@ -69,7 +75,7 @@ fun MainScreen() {
                         text = "Відгуки",
                         icon = Icons.Default.Star,
                         payload = ResponsesPayload
-                    ),
+                    ).takeIf { showResponses },
                     NavigationBarItemModel(
                         text = "Профіль",
                         icon = Icons.Default.AccountCircle,

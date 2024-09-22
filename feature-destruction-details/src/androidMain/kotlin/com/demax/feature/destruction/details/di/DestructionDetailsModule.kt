@@ -13,7 +13,11 @@ import org.koin.dsl.module
 
 fun featureDestructionDetailsModule() = module {
     viewModel<DestructionDetailsViewModel> { (payload: DestructionDetailsPayload) ->
-        DestructionDetailsViewModel(payload = payload, repository = get())
+        DestructionDetailsViewModel(
+            payload = payload,
+            repository = get(),
+            userRepository = get(),
+        )
     }
     factoryOf(::DestructionDetailsUiMapper)
     factoryOf(::DestructionDetailsRepositoryImpl) { bind<DestructionDetailsRepository>() }

@@ -2,6 +2,7 @@ package com.demax.feature.destruction.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demax.core.domain.repository.UserRepository
 import com.demax.core.mvi.Mvi
 import com.demax.core.mvi.createMviDelegate
 import com.demax.feature.destruction.details.domain.DestructionDetailsRepository
@@ -21,19 +22,24 @@ import kotlinx.datetime.toLocalDateTime
 class DestructionDetailsViewModel(
     private val payload: DestructionDetailsPayload,
     private val repository: DestructionDetailsRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel(),
     Mvi<DestructionDetailsState, DestructionDetailsIntent, DestructionDetailsSideEffect> by
     createMviDelegate(
         DestructionDetailsState(
             destructionDetails = null,
             volunteerHelpBottomSheet = null,
-            // TODO Pits: false
-            isAdministrator = true,
+            isAdministrator = false,
         )
     ) {
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserFlow().collect {
+                updateUiState { copy(isAdministrator = it?.isAdministrator == true) }
+            }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
             repository.getDestructionDetails(payload.id)
                 .onSuccess { destructionDetails ->
                     updateUiState {
@@ -62,6 +68,7 @@ class DestructionDetailsViewModel(
     override fun onIntent(intent: DestructionDetailsIntent) {
         when (intent) {
             is DestructionDetailsIntent.ProvideVolunteerHelpClicked -> onProvideVolunteerHelpClicked()
+            is DestructionDetailsIntent.ResourceClicked -> onResourceClicked(intent)
             is DestructionDetailsIntent.ProvideResourceHelpClicked -> onProvideResourceHelpClicked()
             is DestructionDetailsIntent.AddResourceClicked -> onAddResourceClicked()
 
@@ -76,6 +83,10 @@ class DestructionDetailsViewModel(
 
     private fun onProvideVolunteerHelpClicked() {
         viewModelScope.emitSideEffect(DestructionDetailsSideEffect.OpenVolunteerHelpBottomSheet)
+    }
+
+    private fun onResourceClicked(intent: DestructionDetailsIntent.ResourceClicked) {
+        viewModelScope.emitSideEffect(DestructionDetailsSideEffect.OpenResourceDetails(intent.id))
     }
 
     private fun onProvideResourceHelpClicked() {

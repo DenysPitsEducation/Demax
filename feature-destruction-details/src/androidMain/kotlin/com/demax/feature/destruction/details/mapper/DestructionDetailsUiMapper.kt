@@ -71,6 +71,7 @@ internal class DestructionDetailsUiMapper(
         return VolunteerNeedsBlockUiModel(
             needs = needs.map { need ->
                 NeedUiModel(
+                    id = need.id,
                     name = need.name,
                     progress = getProgressUiModel(need.amount),
                 )
@@ -83,6 +84,7 @@ internal class DestructionDetailsUiMapper(
         return ResourceNeedsBlockUiModel(
             needs = needs.map { need ->
                 NeedUiModel(
+                    id = need.id,
                     name = need.name,
                     progress = getProgressUiModel(need.amount),
                 )

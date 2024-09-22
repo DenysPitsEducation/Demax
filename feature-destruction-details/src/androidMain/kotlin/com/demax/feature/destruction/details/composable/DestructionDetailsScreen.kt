@@ -2,6 +2,7 @@ package com.demax.feature.destruction.details.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -111,6 +112,10 @@ fun DestructionDetailsScreen(navController: NavHostController, payload: Destruct
 
             is DestructionDetailsSideEffect.ShowSnackbar -> scope.launch {
                 snackbarHostState.showSnackbar(sideEffect.text)
+            }
+
+            is DestructionDetailsSideEffect.OpenResourceDetails -> {
+                router.openResourceDetails(navController, sideEffect.id)
             }
 
             is DestructionDetailsSideEffect.OpenResourceHelpBottomSheet -> {
@@ -310,7 +315,12 @@ private fun ResourceNeedsBlockComposable(
         Spacer(modifier = Modifier.height(8.dp))
         model.needs.forEach { needModel ->
             Spacer(modifier = Modifier.height(8.dp))
-            NeedComposable(needModel)
+            NeedComposable(
+                model = needModel,
+                modifier = Modifier.clickable {
+                    onUserInteraction(DestructionDetailsIntent.ResourceClicked(needModel.id))
+                },
+            )
         }
         if (model.showHelpButton) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -338,13 +348,14 @@ private fun ResourceNeedsBlockComposable(
 }
 
 @Composable
-private fun NeedComposable(model: NeedUiModel) {
+private fun NeedComposable(model: NeedUiModel, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
             .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text(
@@ -388,6 +399,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
     volunteerNeedsBlock = VolunteerNeedsBlockUiModel(
         needs = listOf(
             NeedUiModel(
+                id = "0",
                 name = "Психотерапія",
                 progress = ProgressUiModel(
                     progress = 0.3,
@@ -397,6 +409,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
                 ),
             ),
             NeedUiModel(
+                id = "1",
                 name = "Педіатрія",
                 progress = ProgressUiModel(
                     progress = 0.3,
@@ -411,6 +424,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
     resourceNeedsBlock = ResourceNeedsBlockUiModel(
         needs = listOf(
             NeedUiModel(
+                id = "0",
                 name = "Зарядні пристрої",
                 progress = ProgressUiModel(
                     progress = 1.0,

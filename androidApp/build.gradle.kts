@@ -47,8 +47,10 @@ dependencies {
     implementation(libs.compose.navigation)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.koin.android)
+    implementation(libs.koin.compose)
     implementation(libs.kotlinx.serialization)
     implementation(project.dependencies.platform(libs.koin.bom))
 

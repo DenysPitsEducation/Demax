@@ -59,6 +59,10 @@ fun appModule() = module {
                 navController.navigate(ResourceEditPayload(resourceId = null))
             }
 
+            override fun openResourceDetails(navController: NavController, id: String) {
+                navController.navigate(ResourceDetailsPayload(id))
+            }
+
             @Composable
             override fun ResourceHelpBottomSheet(
                 payload: ResourceHelpPayload,

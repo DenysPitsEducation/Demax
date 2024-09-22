@@ -19,7 +19,7 @@ internal class ResourcesUiMapper(
         return ResourcesUiModel(
             searchInput = searchInput,
             filterUiModels = filters.toUiModel(),
-            showAddDestructionButton = isAdministrator,
+            showAddResourceButton = isAdministrator,
             resourceUiModels = visibleResources.map { it.toUiModel() }
         )
     }

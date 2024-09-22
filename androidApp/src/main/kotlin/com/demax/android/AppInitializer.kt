@@ -6,15 +6,19 @@ import com.demax.core.data.model.VolunteerNeedDataModel
 import com.demax.core.data.model.DestructionDataModel
 import com.demax.core.data.model.ResourceDataModel
 import com.demax.core.data.model.ProfileDataModel
+import com.demax.core.domain.repository.UserRepository
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AppInitializer {
+class AppInitializer(
+    private val userRepository: UserRepository,
+) {
     fun initialize() {
         CoroutineScope(Dispatchers.IO).launch {
+            userRepository.initUser()
             // initDestructions()
             // initResources()
             // initProfile()

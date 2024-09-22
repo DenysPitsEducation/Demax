@@ -19,7 +19,8 @@ data class ResourcesState(
                 selectedFilters.mapNotNull { (it.type as? FilterOptionDomainModel.Type.Status)?.status }
 
             (resource.category in selectedCategories || selectedCategories.isEmpty()) &&
-                (resource.status in selectedStatuses || selectedStatuses.isEmpty())
+                (resource.status in selectedStatuses || selectedStatuses.isEmpty()) &&
+                resource.name.contains(searchInput, ignoreCase = true)
         }
     }
 }

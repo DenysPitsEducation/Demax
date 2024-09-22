@@ -183,7 +183,11 @@ fun DestructionsScreen(navController: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    onUserInteraction(DestructionsIntent.FilterOptionClicked(filterOption.type))
+                                    onUserInteraction(
+                                        DestructionsIntent.FilterOptionClicked(
+                                            filterOption.type
+                                        )
+                                    )
                                 }
                         ) {
                             Checkbox(
@@ -271,20 +275,22 @@ private fun DestructionsContent(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        onUserInteraction(DestructionsIntent.AddDestructionClicked)
-                    }
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+            if (model.showAddDestructionButton) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            onUserInteraction(DestructionsIntent.AddDestructionClicked)
+                        }
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(12.dp))

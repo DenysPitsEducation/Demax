@@ -34,6 +34,8 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
         }
         commonMain.dependencies {
+            implementation(libs.firebase.auth)
+            implementation(libs.firebase.firestore)
             implementation(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)

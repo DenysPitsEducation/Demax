@@ -2,6 +2,7 @@ package com.demax.feature.resources
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demax.core.domain.repository.UserRepository
 import com.demax.core.mvi.Mvi
 import com.demax.core.mvi.createMviDelegate
 import com.demax.feature.resources.domain.ResourcesRepository
@@ -10,10 +11,12 @@ import com.demax.feature.resources.domain.model.ResourceDomainModel
 import com.demax.feature.resources.mvi.ResourcesIntent
 import com.demax.feature.resources.mvi.ResourcesSideEffect
 import com.demax.feature.resources.mvi.ResourcesState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ResourcesViewModel(
     private val repository: ResourcesRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel(),
     Mvi<ResourcesState, ResourcesIntent, ResourcesSideEffect> by
     createMviDelegate(
@@ -26,7 +29,12 @@ class ResourcesViewModel(
     ) {
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            userRepository.getUserFlow().collect {
+                updateUiState { copy(isAdministrator = it?.isAdministrator == true) }
+            }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
             repository.getResources().onSuccess { resources ->
                 updateUiState {
                     copy(
