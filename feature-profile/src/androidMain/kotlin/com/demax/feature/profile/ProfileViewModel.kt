@@ -44,6 +44,7 @@ class ProfileViewModel(
             is ProfileIntent.DescriptionInputChanged -> onDescriptionInputChanged(intent)
             is ProfileIntent.SaveButtonClicked -> onSaveButtonClicked()
             is ProfileIntent.HelpHistoryButtonClicked -> onHelpHistoryButtonClicked()
+            is ProfileIntent.LogoutButtonClicked -> onLogoutButtonClicked()
         }
     }
 
@@ -87,5 +88,16 @@ class ProfileViewModel(
 
     private fun onHelpHistoryButtonClicked() {
         viewModelScope.emitSideEffect(ProfileSideEffect.OpenHelpHistory(payload.profileId ?: Firebase.auth.currentUser!!.uid))
+    }
+
+    private fun onLogoutButtonClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.logout().onSuccess {
+                viewModelScope.emitSideEffect(ProfileSideEffect.OpenAuthorizationFlow)
+            }.onFailure {
+                it.printStackTrace()
+                viewModelScope.emitSideEffect(ProfileSideEffect.ShowSnackbar("Помилка виходу з акаунту"))
+            }
+        }
     }
 }

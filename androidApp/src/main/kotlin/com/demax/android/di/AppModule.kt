@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import com.demax.android.AppInitializer
 import com.demax.android.MainPayload
 import com.demax.core.navigation.ResourceHelpPayload
+import com.demax.feature.authorization.common.AuthorizationPayload
 import com.demax.feature.authorization.common.AuthorizationRouter
 import com.demax.feature.authorization.login.LoginPayload
 import com.demax.feature.authorization.passwordReset.PasswordResetPayload
@@ -111,6 +112,10 @@ fun appModule() = module {
         object : ProfileRouter {
             override fun openHelpHistory(navController: NavController, profileId: String) {
                 navController.navigate(HelpHistoryPayload(profileId))
+            }
+
+            override fun openAuthorizationFlow(navController: NavController) {
+                navController.navigate(AuthorizationPayload)
             }
         }
     }

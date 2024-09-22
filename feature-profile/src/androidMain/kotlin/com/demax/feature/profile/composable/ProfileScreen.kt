@@ -67,6 +67,7 @@ fun ProfileScreen(navController: NavHostController, payload: ProfilePayload) {
     ) { sideEffect ->
         when (sideEffect) {
             is ProfileSideEffect.OpenHelpHistory -> router.openHelpHistory(navController, sideEffect.profileId)
+            is ProfileSideEffect.OpenAuthorizationFlow -> router.openAuthorizationFlow(navController)
             is ProfileSideEffect.ShowSnackbar -> snackbarHostState.showSnackbar(sideEffect.text)
         }
     }
@@ -242,6 +243,14 @@ private fun ProfileContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Історія допомог")
+        }
+        Button(
+            onClick = {
+                onUserInteraction(ProfileIntent.LogoutButtonClicked)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Вийти з акаунту")
         }
         Spacer(modifier = Modifier.height(32.dp))
     }

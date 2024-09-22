@@ -11,4 +11,5 @@ sealed interface ProfileIntent {
     data class DescriptionInputChanged(val input: String) : ProfileIntent
     data object SaveButtonClicked : ProfileIntent
     data object HelpHistoryButtonClicked : ProfileIntent
+    data object LogoutButtonClicked : ProfileIntent
 }

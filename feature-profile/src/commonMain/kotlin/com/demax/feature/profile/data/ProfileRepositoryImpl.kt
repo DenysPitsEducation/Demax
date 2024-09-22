@@ -78,4 +78,10 @@ class ProfileRepositoryImpl : ProfileRepository {
             helpsCount = helpsCount
         )
     }
+
+    override suspend fun logout(): Result<Unit> {
+        return runCatching {
+            Firebase.auth.signOut()
+        }
+    }
 }
