@@ -47,12 +47,20 @@ internal class DestructionsRepositoryImpl(
         val resourceProgress = run {
             val currentSum = resources.sumOf { it.amount.currentAmount }
             val totalSum = resources.sumOf { it.amount.totalAmount }
-            currentSum * 1.0 / totalSum
+            if (totalSum == 0) {
+                0.0
+            } else {
+                currentSum * 1.0 / totalSum
+            }
         }
         val volunteerProgress = run {
             val currentSum = volunteerNeeds.sumOf { it.amount.currentAmount }
             val totalSum = volunteerNeeds.sumOf { it.amount.totalAmount }
-            currentSum * 1.0 / totalSum
+            if (totalSum == 0) {
+                0.0
+            } else {
+                currentSum * 1.0 / totalSum
+            }
         }
         return DestructionDomainModel(
             id = id,

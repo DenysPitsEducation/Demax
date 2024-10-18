@@ -360,8 +360,9 @@ private fun NeedComposable(model: NeedUiModel, modifier: Modifier = Modifier) {
     ) {
         Text(
             text = model.name,
+            modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.width(8.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row {
                 Text(
@@ -440,7 +441,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
 )
 
 @Composable
-@Preview
+@Preview(device = "spec:width=1080px,height=5340px,dpi=440")
 private fun DestructionDetailsContentPreview() {
     PreviewContainer {
         DestructionDetailsContent(

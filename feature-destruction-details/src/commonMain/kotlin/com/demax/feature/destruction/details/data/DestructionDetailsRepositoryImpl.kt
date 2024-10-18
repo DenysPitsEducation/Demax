@@ -30,9 +30,11 @@ class DestructionDetailsRepositoryImpl(
             val destructionDocument = destructionsCollection.document(id).get()
             val destructionDataModel = destructionDocument.data(DestructionDataModel.serializer())
             val resourcesCollection = Firebase.firestore.collection("resources")
-            val resourceDocuments = resourcesCollection.where {
-                FieldPath.documentId inArray destructionDataModel.resourceNeeds
-            }.get().documents
+            val resourceDocuments = if (destructionDataModel.resourceNeeds.isNotEmpty()) {
+                resourcesCollection.where {
+                    FieldPath.documentId inArray destructionDataModel.resourceNeeds
+                }.get().documents
+            } else emptyList()
             val resources = resourceDocuments.map { document ->
                 document.id to document.data(ResourceDataModel.serializer())
             }

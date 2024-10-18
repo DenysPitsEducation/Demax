@@ -67,7 +67,9 @@ internal class ResourcesUiMapper(
     }
 
     private fun getProgressUiModel(amount: ResourceDomainModel.AmountDomainModel): ResourceUiModel.ProgressUiModel {
-        val progress = amount.currentAmount * 1.0 / amount.totalAmount
+        val progress = if (amount.totalAmount != 0) {
+            amount.currentAmount * 1.0 / amount.totalAmount
+        } else 0.0
         return ResourceUiModel.ProgressUiModel(
             progress = progress,
             amount = "${amount.currentAmount}/${amount.totalAmount}",

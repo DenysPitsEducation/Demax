@@ -95,7 +95,9 @@ internal class DestructionDetailsUiMapper(
     }
 
     private fun getProgressUiModel(amount: AmountDomainModel): ProgressUiModel {
-        val progress = amount.currentAmount * 1.0 / amount.totalAmount
+        val progress = if (amount.totalAmount != 0) {
+            amount.currentAmount * 1.0 / amount.totalAmount
+        } else 0.0
         return ProgressUiModel(
             progress = progress,
             amount = "${amount.currentAmount}/${amount.totalAmount}",

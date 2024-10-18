@@ -29,7 +29,7 @@ fun FeedbackComposable(modifier: Modifier = Modifier) {
     ) {
         Row {
             Text(
-                text = "Анастасія Мороз:",
+                text = "Анастасія Кудрявченко:",
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(

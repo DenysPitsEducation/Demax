@@ -233,7 +233,7 @@ private fun ProfileContent(
         ) {
             Text(text = "Участь у волонтерській діяльності", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "${model.helpsCount} рази")
+            Text(text = "${model.helpsCount} раз")
         }
         Spacer(modifier = Modifier.height(8.dp))
         Button(
