@@ -15,6 +15,7 @@ import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.firestore.where
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.byUnicodePattern
 
 class HelpHistoryRepositoryImpl(
@@ -83,13 +84,13 @@ class HelpHistoryRepositoryImpl(
                     }
                 )
             } else {
-                val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
+                val formatter = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm") }
                 val destruction = destructions.getValue(destructionId!!)
                 HelpTypeDomainModel.Volunteer(
                     destruction = DestructionDomainModel(
                         id = destructionId!!,
                         imageUrl = destruction.imageUrl,
-                        destructionDate = formatter.parse(destruction.destructionDate),
+                        destructionDate = formatter.parse(destruction.destructionDate).date,
                         address = destruction.address,
                     ),
                     specializations = specializations.orEmpty(),

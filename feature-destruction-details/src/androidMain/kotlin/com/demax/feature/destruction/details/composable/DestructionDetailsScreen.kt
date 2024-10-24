@@ -240,6 +240,8 @@ private fun DestructionDetailsContent(
             Text(text = "Кількість зруйнованих поверхів: " + model.destructionStatistics.destroyedFloors)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Кількість зруйнованих секцій (під’їздів): " + model.destructionStatistics.destroyedSections)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Відсоток руйнування: " + model.destructionStatistics.destroyedPercentage)
         }
         Spacer(modifier = Modifier.height(8.dp))
         Column(
@@ -393,7 +395,8 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
     address = "вул Чорновола, 28",
     destructionStatistics = DestructionStatisticsUiModel(
         destroyedFloors = "10",
-        destroyedSections = "1"
+        destroyedSections = "1",
+        destroyedPercentage = "50%"
     ),
     destructionDate = "08/07/2024",
     description = "Будівля зазнала невиправних руйнувань, приблизна кількість жертв становить ...",

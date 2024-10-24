@@ -14,6 +14,7 @@ import com.demax.feature.destruction.edit.navigation.DestructionEditPayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -51,7 +52,14 @@ class DestructionEditViewModel(
             is DestructionEditIntent.ApartmentsSquareChanged -> onApartmentsSquareChanged(intent)
             is DestructionEditIntent.DestroyedFloorsChanged -> onDestroyedFloorsChanged(intent)
             is DestructionEditIntent.DestroyedSectionsChanged -> onDestroyedSectionsChanged(intent)
+            is DestructionEditIntent.DestroyedPercentageChanged -> onDestroyedPercentageChanged(
+                intent
+            )
+
+            is DestructionEditIntent.ArchitectureMonumentCheckboxClicked -> onArchitectureMonumentCheckboxClicked()
+            is DestructionEditIntent.DangerousSubstancesCheckboxClicked -> onDangerousSubstancesCheckboxClicked()
             is DestructionEditIntent.DestructionDateSelected -> onDestructionDateSelected(intent)
+            is DestructionEditIntent.DestructionTimeSelected -> onDestructionTimeSelected(intent)
             is DestructionEditIntent.DescriptionChanged -> onDescriptionChanged(intent)
             is DestructionEditIntent.EditResourcesClicked -> onEditResourcesClicked()
             is DestructionEditIntent.CreateButtonClicked -> onCreateButtonClicked()
@@ -127,12 +135,52 @@ class DestructionEditViewModel(
         }
     }
 
+    private fun onDestroyedPercentageChanged(intent: DestructionEditIntent.DestroyedPercentageChanged) {
+        val destroyedPercentage = intent.value.toIntOrNull()?.coerceIn(0, 100)
+        if (destroyedPercentage != null) {
+            updateUiState { copy(domainModel = domainModel?.copy(destroyedPercentage = destroyedPercentage)) }
+        }
+    }
+
+    private fun onArchitectureMonumentCheckboxClicked() {
+        updateUiState {
+            copy(
+                domainModel = domainModel?.copy(
+                    isArchitecturalMonument = !domainModel.isArchitecturalMonument
+                )
+            )
+        }
+    }
+
+    private fun onDangerousSubstancesCheckboxClicked() {
+        updateUiState {
+            copy(
+                domainModel = domainModel?.copy(
+                    containsDangerousSubstances = !domainModel.containsDangerousSubstances
+                )
+            )
+        }
+    }
+
     private fun onDestructionDateSelected(intent: DestructionEditIntent.DestructionDateSelected) {
         updateUiState {
             val localDate = intent.dateMillis?.let {
                 Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault())
             }?.date
             copy(domainModel = domainModel?.copy(destructionDate = localDate))
+        }
+    }
+
+    private fun onDestructionTimeSelected(intent: DestructionEditIntent.DestructionTimeSelected) {
+        updateUiState {
+            copy(
+                domainModel = domainModel?.copy(
+                    destructionTime = LocalTime(
+                        hour = intent.hour,
+                        minute = intent.minute
+                    )
+                )
+            )
         }
     }
 

@@ -11,6 +11,7 @@ import com.demax.feature.destruction.edit.model.PredictionSwitchUiModel
 import com.demax.feature.destruction.edit.model.NeedsUiModel
 import com.demax.feature.destruction.edit.mvi.DestructionEditState
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.format.byUnicodePattern
 
 internal class DestructionEditUiMapper(
@@ -22,7 +23,8 @@ internal class DestructionEditUiMapper(
     }
 
     private fun DestructionEditDomainModel.toUiModel(): DestructionEditUiModel {
-        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
+        val dateFormatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
+        val timeFormatter = LocalTime.Format { byUnicodePattern("HH:mm") }
         return DestructionEditUiModel(
             image = imageUrl ?: imageFile?.uri,
             buildingType = buildingType?.let { buildingTypeUiMapper.mapToUiModel(it) }.orEmpty(),
@@ -36,7 +38,11 @@ internal class DestructionEditUiMapper(
             apartmentsSquare = apartmentsSquare?.toString().orEmpty(),
             destroyedFloors = destroyedFloors?.toString().orEmpty(),
             destroyedSections = destroyedSections?.toString().orEmpty(),
-            destructionDate = destructionDate?.let { formatter.format(it) }.orEmpty(),
+            destroyedPercentage = destroyedPercentage?.toString().orEmpty(),
+            isArchitecturalMonument = isArchitecturalMonument,
+            containsDangerousSubstances = containsDangerousSubstances,
+            destructionDate = destructionDate?.let { dateFormatter.format(it) }.orEmpty(),
+            destructionTime = destructionTime?.let { timeFormatter.format(it) }.orEmpty(),
             description = description.orEmpty(),
             createButtonEnabled = isCreateButtonEnabled(needsDomainModel),
         )

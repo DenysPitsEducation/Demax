@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 data class DestructionStatisticsDataModel(
     val destroyedFloors: String,
     val destroyedSections: String,
+    val destroyedPercentage: Int,
+    val isArchitecturalMonument: Boolean,
+    val containsDangerousSubstances: Boolean,
 )

@@ -10,7 +10,11 @@ data class DestructionEditUiModel(
     val apartmentsSquare: String,
     val destroyedFloors: String,
     val destroyedSections: String,
+    val destroyedPercentage: String,
+    val isArchitecturalMonument: Boolean,
+    val containsDangerousSubstances: Boolean,
     val destructionDate: String,
+    val destructionTime: String,
     val description: String,
     val createButtonEnabled: Boolean,
 )

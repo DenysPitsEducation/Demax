@@ -35,7 +35,10 @@ class AppInitializer(
                 address = "вул Чорновола, 28",
                 destructionStatistics = DestructionStatisticsDataModel(
                     destroyedFloors = "10",
-                    destroyedSections = "1"
+                    destroyedSections = "1",
+                    destroyedPercentage = 23,
+                    isArchitecturalMonument = true,
+                    containsDangerousSubstances = true,
                 ),
                 destructionDate = "2024-07-08",
                 description = "Будівля зазнала невиправних руйнувань, приблизна кількість жертв становить ...",
@@ -52,7 +55,10 @@ class AppInitializer(
                 address = "вул Лобановського, 28",
                 destructionStatistics = DestructionStatisticsDataModel(
                     destroyedFloors = "5",
-                    destroyedSections = "2"
+                    destroyedSections = "2",
+                    destroyedPercentage = 55,
+                    isArchitecturalMonument = false,
+                    containsDangerousSubstances = false,
                 ),
                 destructionDate = "2022-07-08",
                 description = "Будівля зазнала невиправних руйнувань, приблизна кількість жертв становить ...",

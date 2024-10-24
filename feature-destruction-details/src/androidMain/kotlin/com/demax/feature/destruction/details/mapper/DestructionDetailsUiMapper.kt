@@ -18,6 +18,7 @@ import com.demax.feature.destruction.details.model.VolunteerNeedBottomSheetUiMod
 import com.demax.feature.destruction.details.model.VolunteerNeedsBlockUiModel
 import com.demax.feature.destruction.details.mvi.DestructionDetailsState
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.byUnicodePattern
 
 internal class DestructionDetailsUiMapper(
@@ -29,7 +30,7 @@ internal class DestructionDetailsUiMapper(
     }
 
     private fun DestructionDetailsDomainModel.toUiModel(isAdministrator: Boolean): DestructionDetailsUiModel {
-        val formatter = LocalDate.Format { byUnicodePattern("dd/MM/yyyy") }
+        val formatter = LocalDateTime.Format { byUnicodePattern("dd/MM/yyyy HH:mm") }
         return DestructionDetailsUiModel(
             imageUrl = imageUrl,
             status = when (status) {
@@ -64,6 +65,7 @@ internal class DestructionDetailsUiMapper(
         return DestructionStatisticsUiModel(
             destroyedFloors = destroyedFloors,
             destroyedSections = destroyedSections,
+            destroyedPercentage = "$destroyedPercentage%"
         )
     }
 

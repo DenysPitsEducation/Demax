@@ -1,5 +1,7 @@
 package com.demax.feature.destruction.edit.composable
 
+import android.app.TimePickerDialog
+import android.widget.Space
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +27,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -35,11 +41,15 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,6 +69,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.demax.core.mvi.SideEffectLaunchedEffect
@@ -317,6 +329,46 @@ private fun DestructionEditContent(
             label = { Text(text = "Кількість зруйнованих секцій (під’їздів)") },
             modifier = Modifier.fillMaxWidth(),
         )
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = model.destroyedPercentage,
+            onValueChange = {
+                onUserInteraction(DestructionEditIntent.DestroyedPercentageChanged(it))
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+            ),
+            label = { Text(text = "Відсоток руйнування (%)") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = model.isArchitecturalMonument,
+                onCheckedChange = {
+                    onUserInteraction(DestructionEditIntent.ArchitectureMonumentCheckboxClicked)
+                },
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Архітектурна пам’ятка")
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = model.containsDangerousSubstances,
+                onCheckedChange = {
+                    onUserInteraction(DestructionEditIntent.DangerousSubstancesCheckboxClicked)
+                },
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Містить небезпечні речовини")
+        }
 
         val datePickerState = rememberDatePickerState()
         var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -372,6 +424,68 @@ private fun DestructionEditContent(
             }
         }
 
+        val timePickerState = rememberTimePickerState(is24Hour = true)
+        var showTimePickerDialog by remember { mutableStateOf(false) }
+        Spacer(modifier = Modifier.height(12.dp))
+        Box {
+            OutlinedTextField(
+                value = model.destructionTime,
+                onValueChange = {},
+                readOnly = true,
+                placeholder = { Text("Час руйнування") },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Select time"
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusProperties { canFocus = false }
+            )
+            Box(modifier = Modifier
+                .matchParentSize()
+                .clickable {
+                    showTimePickerDialog = !showTimePickerDialog
+                })
+        }
+
+        LaunchedEffect(timePickerState.minute, timePickerState.hour) {
+            onUserInteraction(
+                DestructionEditIntent.DestructionTimeSelected(
+                    timePickerState.hour,
+                    timePickerState.minute
+                )
+            )
+        }
+
+        if (showTimePickerDialog) {
+            BasicAlertDialog(
+                onDismissRequest = {
+                    showTimePickerDialog = false
+                },
+                modifier = Modifier.clip(RoundedCornerShape(16.dp))
+            ) {
+                Surface {
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        TimePicker(state = timePickerState)
+                        Button(
+                            onClick = {
+                                showTimePickerDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                text = "Зберегти зміни"
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
         OutlinedTextField(
@@ -425,13 +539,17 @@ fun createDestructionEditUiModelMock() = DestructionEditUiModel(
     apartmentsSquare = "50",
     destroyedFloors = "2",
     destroyedSections = "1",
+    destroyedPercentage = "23",
+    isArchitecturalMonument = true,
+    containsDangerousSubstances = false,
     destructionDate = "2024/12/12",
+    destructionTime = "20:45",
     description = "Description",
     createButtonEnabled = true,
 )
 
 @Composable
-@Preview
+@Preview(device = "spec:width=1080px,height=5340px,dpi=440")
 private fun DestructionDetailsContentPreview() {
     PreviewContainer {
         DestructionEditContent(

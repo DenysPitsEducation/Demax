@@ -10,6 +10,7 @@ import com.demax.feature.resource.details.domain.model.ResourceDetailsDomainMode
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.byUnicodePattern
 
 class ResourceDetailsRepositoryImpl(
@@ -47,10 +48,10 @@ class ResourceDetailsRepositoryImpl(
     }
 
     private fun DestructionDataModel.toDomainModel(): DestructionDomainModel {
-        val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
+        val formatter = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm") }
         return DestructionDomainModel(
             imageUrl = imageUrl,
-            destructionDate = formatter.parse(destructionDate),
+            destructionDate = formatter.parse(destructionDate).date,
             address = address
         )
     }

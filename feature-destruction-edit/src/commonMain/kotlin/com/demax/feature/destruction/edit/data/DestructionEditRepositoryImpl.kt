@@ -15,6 +15,7 @@ import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.storage.File
 import dev.gitlive.firebase.storage.storage
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.byUnicodePattern
 
 class DestructionEditRepositoryImpl(
@@ -34,7 +35,11 @@ class DestructionEditRepositoryImpl(
                 apartmentsSquare = null,
                 destroyedFloors = null,
                 destroyedSections = null,
+                destroyedPercentage = null,
+                isArchitecturalMonument = false,
+                containsDangerousSubstances = false,
                 destructionDate = null,
+                destructionTime = null,
                 description = null,
                 needsDomainModel = NeedsDomainModel(
                     helpPackages = 0,
@@ -78,7 +83,8 @@ class DestructionEditRepositoryImpl(
     }
 
     private fun DestructionEditDomainModel.toDestructionDataModel(uploadedImageUrl: String?): DestructionDataModel {
-        val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
+        val dateTime = LocalDateTime(destructionDate ?: throw ValidationException, destructionTime ?: throw ValidationException)
+        val formatter = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm") }
         return DestructionDataModel(
             imageUrl = uploadedImageUrl ?: imageUrl,
             buildingType = buildingTypeMapper.mapToDataModel(
@@ -86,10 +92,13 @@ class DestructionEditRepositoryImpl(
             ),
             address = address ?: throw ValidationException,
             destructionStatistics = DestructionStatisticsDataModel(
-                destroyedFloors = destroyedFloors.toString(),
-                destroyedSections = destroyedSections.toString(),
+                destroyedFloors = destroyedFloors?.toString() ?: throw ValidationException,
+                destroyedSections = destroyedSections?.toString() ?: throw ValidationException,
+                destroyedPercentage = destroyedPercentage ?: throw ValidationException,
+                isArchitecturalMonument = isArchitecturalMonument,
+                containsDangerousSubstances = containsDangerousSubstances,
             ),
-            destructionDate = formatter.format(destructionDate ?: throw ValidationException),
+            destructionDate = formatter.format(dateTime),
             description = description ?: throw ValidationException,
             volunteerNeeds = needsDomainModel.specializations
                 .filter { it.quantity > 0 }

@@ -11,6 +11,7 @@ import dev.gitlive.firebase.firestore.FieldPath
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.firestore.where
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.byUnicodePattern
 
 internal class DestructionsRepositoryImpl(
@@ -43,7 +44,7 @@ internal class DestructionsRepositoryImpl(
         id: String,
         resources: List<ResourceDataModel>
     ): DestructionDomainModel {
-        val formatter = LocalDate.Format { byUnicodePattern("yyyy-MM-dd") }
+        val formatter = LocalDateTime.Format { byUnicodePattern("yyyy-MM-dd HH:mm") }
         val resourceProgress = run {
             val currentSum = resources.sumOf { it.amount.currentAmount }
             val totalSum = resources.sumOf { it.amount.totalAmount }
@@ -67,7 +68,7 @@ internal class DestructionsRepositoryImpl(
             imageUrl = imageUrl,
             buildingType = buildingTypeMapper.mapToDomainModel(buildingType),
             address = address,
-            destructionDate = formatter.parse(destructionDate),
+            destructionDate = formatter.parse(destructionDate).date,
             resourceProgress = resourceProgress,
             volunteerProgress = volunteerProgress,
             specializations = volunteerNeeds.map { it.name },
