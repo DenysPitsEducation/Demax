@@ -93,7 +93,14 @@ class DestructionEditViewModel(
             copy(
                 domainModel = domainModel?.copy(
                     buildingType = intent.buildingType,
-                    predictionSwitch = predictionSwitch
+                    predictionSwitch = predictionSwitch,
+                    needsDomainModel = domainModel.needsDomainModel.copy(
+                        helpPackages = if (buildingType == BuildingTypeDomainModel.RESIDENTIAL) {
+                            225
+                        } else {
+                            domainModel.needsDomainModel.helpPackages
+                        },
+                    )
                 )
             )
         }

@@ -267,6 +267,23 @@ private fun DestructionDetailsContent(
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = model.description)
         }
+        if (model.helpPackagesCount != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, Color(0xFFA8A8A9), RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.background, RoundedCornerShape(8.dp))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Кількість пакетів допомоги",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = model.helpPackagesCount)
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
         VolunteerNeedsBlockComposable(model.volunteerNeedsBlock, onUserInteraction)
         Spacer(modifier = Modifier.height(16.dp))
@@ -425,6 +442,7 @@ fun createDestructionDetailsUiModelMock() = DestructionDetailsUiModel(
         ),
         showHelpButton = true,
     ),
+    helpPackagesCount = "225",
     resourceNeedsBlock = ResourceNeedsBlockUiModel(
         needs = listOf(
             NeedUiModel(

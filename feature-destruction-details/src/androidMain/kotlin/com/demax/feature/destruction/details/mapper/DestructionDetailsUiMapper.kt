@@ -1,6 +1,7 @@
 package com.demax.feature.destruction.details.mapper
 
 import androidx.compose.ui.graphics.Color
+import com.demax.core.domain.model.BuildingTypeDomainModel
 import com.demax.core.domain.model.StatusDomainModel
 import com.demax.core.ui.mapper.BuildingTypeUiMapper
 import com.demax.feature.destruction.details.domain.model.AmountDomainModel
@@ -42,6 +43,7 @@ internal class DestructionDetailsUiMapper(
             destructionStatistics = destructionStatistics.toUiModel(),
             destructionDate = formatter.format(destructionDate),
             description = description,
+            helpPackagesCount = if (buildingType == BuildingTypeDomainModel.RESIDENTIAL) "225" else null,
             volunteerNeedsBlock = getVolunteerNeedsBlockUiModel(volunteerNeeds),
             resourceNeedsBlock = getResourceNeedsBlockUiModel(resourceNeeds, isAdministrator),
         )
